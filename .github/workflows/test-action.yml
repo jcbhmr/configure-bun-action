@@ -6,6 +6,7 @@ on:
 jobs:
   bun0:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
@@ -28,6 +29,7 @@ jobs:
       - run: cat test/bun0/_post.mjs
   bun1:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
