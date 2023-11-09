@@ -27,7 +27,6 @@ export default async function bun0(root: string, action: any) {
     owner: "oven-sh",
     repo: "bun",
   });
-  console.log(releases);
   const tags = releases.map((x) => x.tag_name);
   const versions = tags.map((x) => x.match(/(\d+\.\d+\.\d+)/)![1]);
   const version = semver.maxSatisfying(versions, "^1.0.0");

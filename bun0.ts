@@ -33,11 +33,13 @@ export default async function bun0(root: string, action: any) {
     owner: "oven-sh",
     repo: "bun",
   });
-  console.log(releases);
   const tags = releases.map((x) => x.tag_name);
-  const versions = tags.map((x) => x.match(/(\d+\.\d+\.\d+)/)![1]);
+  const versions = tags.map((x) => semver.coerce(x));
+  console.log(versions);
   const version = semver.maxSatisfying(versions, "^0.0.0");
+  console.log(version);
   const tag = tags[versions.indexOf(version)];
+  console.log(tag);
 
   const targetFilenames = {
     "linux-x64": "bun-linux-x64.zip",
