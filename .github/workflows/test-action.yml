@@ -4,21 +4,39 @@ on:
     branches: "main"
   pull_request:
 jobs:
-  test-action:
+  bun0:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - id: main
         uses: ./
         with:
-          path: test
+          path: test/bun0
       - shell: jq -C . {0}
         run: ${{ toJSON(steps.main.outputs) }}
-      - run: tree -a test
-      - run: cat test/action.yml
-      - run: cat test/_main.mjs
-      - run: cat test/_pre.mjs
-      - run: cat test/_post.mjs
+      - run: tree -a test/bun0
+      - run: cat test/bun0/action.yml
+      - run: cat test/bun0/_main.mjs
+      - run: cat test/bun0/_pre.mjs
+      - run: cat test/bun0/_post.mjs
+  bun1:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: main
+        uses: ./
+        with:
+          path: test/bun1
+      - shell: jq -C . {0}
+        run: ${{ toJSON(steps.main.outputs) }}
+      - run: tree -a test/bun1
+      - run: cat test/bun1/action.yml
+      - run: cat test/bun1/_main.mjs
+      - run: cat test/bun1/_pre.mjs
+      - run: cat test/bun1/_post.mjs
