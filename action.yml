@@ -1,4 +1,6 @@
 inputs:
+  path:
+    default: .
   token:
     default: ${{ github.token }}
 
@@ -12,4 +14,5 @@ runs:
     - shell: bash
       run: bun "$GITHUB_ACTION_PATH/main.ts"
       env:
+        INPUT_PATH: ${{ inputs.path }}
         INPUT_TOKEN: ${{ inputs.token }}
