@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { $ } from "execa";
 import { dirname, join, parse, resolve } from "node:path";
 import * as core from "@actions/core";
@@ -50,6 +50,8 @@ export default async function bun0(root: string, action: any) {
     core.info(`unzipping ${downloaded} to ${BUN_INSTALL}`);
     await mkdir(BUN_INSTALL, { recursive: true });
     await $`unzip ${downloaded} -d ${BUN_INSTALL}`;
+    core.debug(`BUN_INSTALL=${await readdir(BUN_INSTALL)}`);
+    core.debug(`BUN_INSTALL/bin=${await readdir(join(BUN_INSTALL, "bin"))}`);
   }
 
   action.runs.using = "node20";
@@ -83,4 +85,7 @@ export default async function bun0(root: string, action: any) {
     action.runs.post = "_post.mjs";
     await writeFile(join(root, action.runs.post), wrapper(postBundle));
   }
+
+  core.debug(`.bun=${await readdir(join(root, ".bun"))}`);
+  core.debug(`dist=${await readdir(join(root, "dist"))}`);
 }
