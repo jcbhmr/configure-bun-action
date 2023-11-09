@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { $ } from "execa";
 import { dirname, join, parse } from "node:path";
 import * as core from "@actions/core";
@@ -52,6 +52,7 @@ export default async function bun0(root: string, action: any) {
     const downloaded = join(process.env.RUNNER_TEMP!, filename);
     await pipeline(response.body, createWriteStream(downloaded));
     const BUN_INSTALL = join(root, ".bun", target);
+    await mkdir(BUN_INSTALL, { recursive: true });
     core.debug(`unzipping ${downloaded} to ${BUN_INSTALL}`);
     await $`unzip ${downloaded} -d ${BUN_INSTALL}`;
   }
@@ -70,18 +71,18 @@ export default async function bun0(root: string, action: any) {
   }
 
   const mainBundle = await bundle(root, action.runs.main);
-  await writeFile(join(root, "_main.mjs"), wrapper(mainBundle));
   action.runs.main = "_main.mjs";
+  await writeFile(join(root, action.runs.main), wrapper(mainBundle));
 
   if (action.runs.pre) {
     const preBundle = await bundle(root, action.runs.pre);
-    await writeFile(join(root, "_pre.mjs"), wrapper(preBundle));
     action.runs.pre = "_pre.mjs";
+    await writeFile(join(root, action.runs.pre), wrapper(preBundle));
   }
 
   if (action.runs.post) {
     const postBundle = await bundle(root, action.runs.post);
-    await writeFile(join(root, "_post.mjs"), wrapper(postBundle));
     action.runs.post = "_post.mjs";
+    await writeFile(join(root, action.runs.post), wrapper(postBundle));
   }
 }
