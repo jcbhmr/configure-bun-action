@@ -66,6 +66,7 @@ export default async function bun0(root: string, action: any) {
   const BUN_INSTALL = join(root, ".bun", target);
   async function bundle(root: string, file: string) {
     const bun = join(BUN_INSTALL, "bun");
+    core.debug(`bun=${bun}`);
 
     const in_ = join(root, file);
     const out = join(root, `dist/${parse(file).name}.js`);
@@ -80,21 +81,28 @@ export default async function bun0(root: string, action: any) {
   }
 
   const mainBundle = await bundle(root, action.runs.main);
+  core.debug(`mainBundle=${mainBundle}`);
   action.runs.main = "_main.mjs";
   await writeFile(join(root, action.runs.main), wrapper(mainBundle));
+  core.info(`wrote ${action.runs.main}`);
 
   if (action.runs.pre) {
     const preBundle = await bundle(root, action.runs.pre);
+    core.debug(`preBundle=${preBundle}`);
     action.runs.pre = "_pre.mjs";
     await writeFile(join(root, action.runs.pre), wrapper(preBundle));
+    core.info(`wrote ${action.runs.pre}`);
   }
 
   if (action.runs.post) {
     const postBundle = await bundle(root, action.runs.post);
+    core.debug(`postBundle=${postBundle}`);
     action.runs.post = "_post.mjs";
     await writeFile(join(root, action.runs.post), wrapper(postBundle));
+    core.info(`wrote ${action.runs.post}`);
   }
 
+  core.debug(`.=${JSON.stringify(await readdir(root))}`);
   core.debug(`.bun=${JSON.stringify(await readdir(join(root, ".bun")))}`);
   core.debug(`dist=${JSON.stringify(await readdir(join(root, "dist")))}`);
 }
