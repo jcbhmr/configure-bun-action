@@ -35,11 +35,9 @@ export default async function bun0(root: string, action: any) {
   });
   const tags = releases.map((x) => x.tag_name);
   const versions = tags.map((x) => semver.coerce(x));
-  console.log(versions);
   const version = semver.maxSatisfying(versions, "^0.0.0");
-  console.log(version);
   const tag = tags[versions.indexOf(version)];
-  console.log(tag);
+  core.debug(`tag=${tag}`);
 
   const targetFilenames = {
     "linux-x64": "bun-linux-x64.zip",
@@ -54,7 +52,8 @@ export default async function bun0(root: string, action: any) {
     const downloaded = join(process.env.RUNNER_TEMP!, filename);
     await pipeline(response.body, createWriteStream(downloaded));
     const BUN_INSTALL = join(root, ".bun", target);
-    await $`unzip -o ${downloaded} -d ${BUN_INSTALL}`;
+    core.debug(`unzipping ${downloaded} to ${BUN_INSTALL}`);
+    await $`unzip ${downloaded} -d ${BUN_INSTALL}`;
   }
 
   action.runs.using = "node20";
@@ -65,6 +64,7 @@ export default async function bun0(root: string, action: any) {
     const bun = join(BUN_INSTALL, "bin", "bun");
     const in_ = join(root, file);
     const out = join(root, `dist/${parse(file).name}.js`);
+    core.debug(`bundling ${in_} to ${out}`);
     await $`${bun} build --target=bun ${in_} --outfile=${out}`;
     return out;
   }
