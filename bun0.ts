@@ -62,7 +62,9 @@ export default async function bun0(root: string, action: any) {
     const out = join(root, `dist/${parse(file).name}.js`);
     core.info(`bundling ${in_} to ${out}`);
     await mkdir(dirname(out), { recursive: true });
-    await $`bash -c "${bun} build --target=bun ${in_} --outfile=${out}"`;
+    await $({
+      shell: "bash",
+    })`${bun} build --target=bun ${in_} --outfile=${out}`;
     return out;
   }
 
