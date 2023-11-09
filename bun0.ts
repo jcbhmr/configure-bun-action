@@ -28,16 +28,9 @@ export default async function bun0(root: string, action: any) {
       "bun0 may be removed in a future release."
   );
 
-  const octokit = github.getOctokit(core.getInput("token"));
-  const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
-    owner: "oven-sh",
-    repo: "bun",
-  });
-  const tags = releases.map((x) => x.tag_name);
-  const versions = tags.map((x) => semver.coerce(x));
-  const version = semver.maxSatisfying(versions, "^0.0.0");
+  const version = "0.8.1";
   core.info(`using bun v${version}`);
-  const tag = tags[versions.indexOf(version)];
+  const tag = "bun-v0.8.1";
   core.debug(`tag=${tag}`);
 
   const targetFilenames = {
