@@ -57,12 +57,12 @@ export default async function bun0(root: string, action: any) {
   const target = `${process.env.RUNNER_OS!.toLowerCase()}-${process.env.RUNNER_ARCH!.toLowerCase()}`;
   const BUN_INSTALL = join(root, ".bun", target);
   async function bundle(root: string, file: string) {
-    const bun = resolve(BUN_INSTALL, "bin", "bun");
+    const bun = join(BUN_INSTALL, "bin", "bun");
     const in_ = join(root, file);
     const out = join(root, `dist/${parse(file).name}.js`);
     core.info(`bundling ${in_} to ${out}`);
     await mkdir(dirname(out), { recursive: true });
-    await $`${bun} build --target=bun ${in_} --outfile=${out}`;
+    await $`bash -c "${bun} build --target=bun ${in_} --outfile=${out}"`;
     return out;
   }
 
