@@ -20,7 +20,7 @@ process.exitCode = (await once(subprocess, "exit"))[0];
 `;
 
 export default async function bun0(root: string, action: any) {
-  assert(action.runs.using === "bun0");
+  assert(action.runs.using === "bun0", "must be bun0");
 
   core.warning("bun0 is deprecated. Please use bun1 instead.");
 
