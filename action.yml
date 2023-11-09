@@ -6,8 +6,10 @@ runs:
   using: composite
   steps:
     - uses: oven-sh/setup-bun@v1
-    - run: bun install
+    - shell: bash
+      run: bun install
       working-directory: ${{ github.action_path }}
-    - run: bun "$GITHUB_ACTION_PATH/main.ts"
+    - shell: bash
+      run: bun "$GITHUB_ACTION_PATH/main.ts"
       env:
         INPUT_TOKEN: ${{ inputs.token }}
