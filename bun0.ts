@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rename, writeFile } from "node:fs/promises";
 import { $ } from "execa";
 import { dirname, join, parse, resolve } from "node:path";
 import * as core from "@actions/core";
@@ -46,12 +46,24 @@ export default async function bun0(root: string, action: any) {
     assert(response.ok, `${response.status} ${response.url}`);
     const downloaded = join(process.env.RUNNER_TEMP!, filename);
     await pipeline(response.body, createWriteStream(downloaded));
+
+    const bunInstallTemp = join(process.env.RUNNER_TEMP!, "bun-install");
+    core.info(`unzipping ${downloaded} to ${bunInstallTemp}`);
+    await $`unzip ${downloaded} -d ${bunInstallTemp}`;
+
     const BUN_INSTALL = join(root, ".bun", target);
-    core.info(`unzipping ${downloaded} to ${BUN_INSTALL}`);
     await mkdir(BUN_INSTALL, { recursive: true });
-    await $`unzip ${downloaded} -d ${BUN_INSTALL}`;
-    core.debug(`BUN_INSTALL=${await readdir(BUN_INSTALL)}`);
-    core.debug(`BUN_INSTALL/bin=${await readdir(join(BUN_INSTALL, "bin"))}`);
+    await rename(
+      join(bunInstallTemp, parse(filename).name),
+      join(BUN_INSTALL, "bin")
+    );
+
+    core.debug(`BUN_INSTALL=${JSON.stringify(await readdir(BUN_INSTALL))}`);
+    core.debug(
+      `BUN_INSTALL/bin=${JSON.stringify(
+        await readdir(join(BUN_INSTALL, "bin"))
+      )}`
+    );
   }
 
   action.runs.using = "node20";
@@ -60,13 +72,16 @@ export default async function bun0(root: string, action: any) {
   const BUN_INSTALL = join(root, ".bun", target);
   async function bundle(root: string, file: string) {
     const bun = join(BUN_INSTALL, "bin", "bun");
+
     const in_ = join(root, file);
     const out = join(root, `dist/${parse(file).name}.js`);
+
     core.info(`bundling ${in_} to ${out}`);
     await mkdir(dirname(out), { recursive: true });
     await $({
       shell: "bash",
     })`${bun} build --target=bun ${in_} --outfile=${out}`;
+
     return out;
   }
 
@@ -86,6 +101,6 @@ export default async function bun0(root: string, action: any) {
     await writeFile(join(root, action.runs.post), wrapper(postBundle));
   }
 
-  core.debug(`.bun=${await readdir(join(root, ".bun"))}`);
-  core.debug(`dist=${await readdir(join(root, "dist"))}`);
+  core.debug(`.bun=${JSON.stringify(await readdir(join(root, ".bun")))}`);
+  core.debug(`dist=${JSON.stringify(await readdir(join(root, "dist")))}`);
 }
