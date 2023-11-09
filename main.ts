@@ -22,7 +22,10 @@ if (action.runs.using === "bun0") {
   const { default: bun1 } = await import("./bun1.ts");
   await bun1(root, action);
 } else {
-  throw new DOMException(`unknown ${action.runs.using}`, "NotSupportedError");
+  throw new DOMException(
+    `${action.runs.using} is not 'bun0' or 'bun1'`,
+    "NotSupportedError"
+  );
 }
 
 core.debug(`action.runs=${JSON.stringify(action.runs)}`);
