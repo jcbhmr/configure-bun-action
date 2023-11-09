@@ -4,7 +4,7 @@ import { $ } from "execa";
 import { dirname, join, parse } from "node:path";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import semver from "semver";
+import * as semver from "semver";
 import { pipeline } from "node:stream/promises";
 import { createWriteStream } from "node:fs";
 
@@ -36,6 +36,7 @@ export default async function bun0(root: string, action: any) {
   const tags = releases.map((x) => x.tag_name);
   const versions = tags.map((x) => semver.coerce(x));
   const version = semver.maxSatisfying(versions, "^0.0.0");
+  core.info(`using bun v${version}`);
   const tag = tags[versions.indexOf(version)];
   core.debug(`tag=${tag}`);
 
@@ -49,11 +50,12 @@ export default async function bun0(root: string, action: any) {
     const response = await fetch(
       `https://github.com/oven-sh/bun/releases/download/${tag}/${filename}`
     );
+    assert(response.ok, `${response.status} ${response.url}`);
     const downloaded = join(process.env.RUNNER_TEMP!, filename);
     await pipeline(response.body, createWriteStream(downloaded));
     const BUN_INSTALL = join(root, ".bun", target);
+    core.info(`unzipping ${downloaded} to ${BUN_INSTALL}`);
     await mkdir(BUN_INSTALL, { recursive: true });
-    core.debug(`unzipping ${downloaded} to ${BUN_INSTALL}`);
     await $`unzip ${downloaded} -d ${BUN_INSTALL}`;
   }
 
@@ -65,7 +67,8 @@ export default async function bun0(root: string, action: any) {
     const bun = join(BUN_INSTALL, "bin", "bun");
     const in_ = join(root, file);
     const out = join(root, `dist/${parse(file).name}.js`);
-    core.debug(`bundling ${in_} to ${out}`);
+    core.info(`bundling ${in_} to ${out}`);
+    await mkdir(dirname(out), { recursive: true });
     await $`${bun} build --target=bun ${in_} --outfile=${out}`;
     return out;
   }
