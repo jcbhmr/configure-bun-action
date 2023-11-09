@@ -58,11 +58,6 @@ export default async function bun0(root: string, action: any) {
     await rename(bunInstallTempActual, BUN_INSTALL);
 
     core.debug(`$BUN_INSTALL=${JSON.stringify(await readdir(BUN_INSTALL))}`);
-    core.debug(
-      `$BUN_INSTALL/bin=${JSON.stringify(
-        await readdir(join(BUN_INSTALL, "bin"))
-      )}`
-    );
   }
 
   action.runs.using = "node20";
@@ -70,7 +65,7 @@ export default async function bun0(root: string, action: any) {
   const target = `${process.env.RUNNER_OS!.toLowerCase()}-${process.env.RUNNER_ARCH!.toLowerCase()}`;
   const BUN_INSTALL = join(root, ".bun", target);
   async function bundle(root: string, file: string) {
-    const bun = join(BUN_INSTALL, "bin", "bun");
+    const bun = join(BUN_INSTALL, "bun");
 
     const in_ = join(root, file);
     const out = join(root, `dist/${parse(file).name}.js`);
