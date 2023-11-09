@@ -39,13 +39,16 @@ export default async function bun0(root: string, action: any) {
     "macos-x64": "bun-darwin-x64.zip",
     "macos-arm64": "bun-darwin-aarch64.zip",
   };
+  core.debug(`targetFilenames=${JSON.stringify(targetFilenames)}`);
   for (const [target, filename] of Object.entries(targetFilenames)) {
     const response = await fetch(
       `https://github.com/oven-sh/bun/releases/download/${tag}/${filename}`
     );
+    core.debug(`response.status=${response.status}`);
     assert(response.ok, `${response.status} ${response.url}`);
     const downloaded = join(process.env.RUNNER_TEMP!, filename);
     await pipeline(response.body, createWriteStream(downloaded));
+    core.debug(`downloaded=${downloaded}`);
 
     const bunInstallTemp = join(process.env.RUNNER_TEMP!, "bun-install");
     core.info(`unzipping ${downloaded} to ${bunInstallTemp}`);
