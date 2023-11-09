@@ -50,17 +50,16 @@ export default async function bun0(root: string, action: any) {
     const bunInstallTemp = join(process.env.RUNNER_TEMP!, "bun-install");
     core.info(`unzipping ${downloaded} to ${bunInstallTemp}`);
     await $`unzip ${downloaded} -d ${bunInstallTemp}`;
+    const bunInstallTempActual = join(bunInstallTemp, parse(filename).name);
 
     const BUN_INSTALL = join(root, ".bun", target);
+    core.info(`moving ${bunInstallTempActual} to ${BUN_INSTALL}`);
     await mkdir(BUN_INSTALL, { recursive: true });
-    await rename(
-      join(bunInstallTemp, parse(filename).name),
-      join(BUN_INSTALL, "bin")
-    );
+    await rename(bunInstallTempActual, BUN_INSTALL);
 
-    core.debug(`BUN_INSTALL=${JSON.stringify(await readdir(BUN_INSTALL))}`);
+    core.debug(`$BUN_INSTALL=${JSON.stringify(await readdir(BUN_INSTALL))}`);
     core.debug(
-      `BUN_INSTALL/bin=${JSON.stringify(
+      `$BUN_INSTALL/bin=${JSON.stringify(
         await readdir(join(BUN_INSTALL, "bin"))
       )}`
     );
