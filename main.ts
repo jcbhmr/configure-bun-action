@@ -1,34 +1,29 @@
-import { stat, readFile, writeFile } from "node:fs/promises";
-import * as core from "@actions/core";
-import * as YAML from "yaml";
-import assert from "node:assert";
+import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import * as core from "@actions/core";
+import * as YAML from "yaml";
 
 const root = core.getInput("path");
+core.debug(`root=${root}`);
+
 const actionPath = ["action.yml", "action.yaml"]
   .map((x) => join(root, x))
-  .find((x) => existsSync(x));
-const action = YAML.parse(await readFile(actionPath, "utf8"));
+  .find((x) => existsSync(x))!;
 
-assert(action.runs.using === "bun1", `unknown ${action.runs.using}`);
-action.runs.using = "node20";
-for (const stage of ["main", "pre", "post"]) {
-  const entry = core.getInput(stage) || action.runs[stage];
-  if (entry) {
-    const text = `\
-import { spawn } from "node:child_process";
-import { dirname, join } from "node:path";
-import { once } from "node:events";
-const suffix = \`\${process.env.RUNNER_OS.toLowerCase()}-\${process.env.RUNNER_ARCH.toLowerCase()}\`;
-const ext = process.platform === "win32" ? ".exe" : "";
-const relative = \`\${${JSON.stringify(stage)}}-\${suffix}\${ext}\`;
-const file = join(dirname(process.argv[1]), relative);
-const subprocess = spawn(file, { stdio: "inherit" });
-process.exitCode = (await once(subprocess, "exit"))[0];
-`;
-    action.runs[stage] = `_${stage}.mjs`;
-    await writeFile(join(root, action.runs[stage]), text);
-  }
+const action = YAML.parse(await readFile(actionPath, "utf8"));
+core.debug(`actionPath=${actionPath}`);
+core.debug(`action.runs=${JSON.stringify(action.runs)}`);
+
+if (action.runs.using === "bun0") {
+  const { default: bun0 } = await import("./bun0.ts");
+  await bun0(root, action);
+} else if (action.runs.using === "bun1") {
+  const { default: bun1 } = await import("./bun1.ts");
+  await bun1(root, action);
+} else {
+  throw new DOMException(`unknown ${action.runs.using}`, "NotSupportedError");
 }
+
+core.debug(`action.runs=${JSON.stringify(action.runs)}`);
 await writeFile(actionPath, YAML.stringify(action));

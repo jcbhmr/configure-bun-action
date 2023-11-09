@@ -11,11 +11,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: jcbhmr/configure-bun-action@503266562a0a6b51c8fd73a4b259488bd99fb704
       - id: main
         uses: ./
         with:
           path: test
       - shell: jq -C . {0}
         run: ${{ toJSON(steps.main.outputs) }}
+      - run: tree -a test
+      - run: cat test/action.yml
+      - run: cat test/_main.mjs
+      - run: cat test/_pre.mjs
+      - run: cat test/_post.mjs
