@@ -16,9 +16,11 @@ core.debug(`actionPath=${actionPath}`);
 core.debug(`action.runs=${JSON.stringify(action.runs)}`);
 
 if (action.runs.using === "bun0") {
+  core.debug("running bun0");
   const { default: bun0 } = await import("./bun0.ts");
   await bun0(root, action);
 } else if (action.runs.using === "bun1") {
+  core.debug("running bun1");
   const { default: bun1 } = await import("./bun1.ts");
   await bun1(root, action);
 } else {

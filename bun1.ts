@@ -22,13 +22,12 @@ process.exitCode = (await once(subprocess, "exit"))[0];
 export default async function bun0(root: string, action: any) {
   assert(action.runs.using === "bun1", "must be bun1");
 
-  core.warning("bun0 is deprecated. Please use bun1 instead.");
-
   const octokit = github.getOctokit(core.getInput("token"));
   const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
     owner: "oven-sh",
     repo: "bun",
   });
+  console.log(releases);
   const tags = releases.map((x) => x.tag_name);
   const versions = tags.map((x) => x.match(/(\d+\.\d+\.\d+)/)![1]);
   const version = semver.maxSatisfying(versions, "^1.0.0");
