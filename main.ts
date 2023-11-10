@@ -45,7 +45,7 @@ function coreDebug(x) {
     console.log(\`::debug::\${escapeData("jcbhmr/configure-bun-action\\n" + x)}\`);
   }
 }
-functioni coreWarn(x) {
+function coreWarn(x) {
   console.log(\`::warning::\${escapeData("jcbhmr/configure-bun-action\\n" + x)}\`);
 }
 
