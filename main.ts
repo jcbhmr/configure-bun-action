@@ -90,7 +90,7 @@ const toolCacheBunInstallPathFor = (version) => join(process.env.RUNNER_TOOL_CAC
 const bunPathFor = (bunInstallPath) => join(bunInstallPath, "bin", "bun" + exeExt);
 coreDebug(\`localBunInstallPath=\${localBunInstallPath}\`)
 
-const copyLocalBunInstallToPath = toolCacheBunInstallPathFor(localBunVeresion);
+const copyLocalBunInstallToPath = toolCacheBunInstallPathFor(localBunVersion);
 if (!existsSync(copyLocalBunInstallToPath)) {
   coreDebug(\`copying \${localBunInstallPath} to \${copyLocalBunInstallToPath}\`)
   await mkdir(dirname(copyLocalBunInstallToPath), { recursive: true });
