@@ -15,6 +15,15 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install --frozen-lockfile
+      - run: |
+          bun build \
+            --entrypoints ./index.ts \
+            --outdir ./dist \
+            --target bun \
+            --splitting
+      - uses: jcbhmr/configure-bun-action@v0.1.0
       - id: main
         uses: ./
         with:
@@ -40,6 +49,15 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install --frozen-lockfile
+      - run: |
+          bun build \
+            --entrypoints ./index.ts \
+            --outdir ./dist \
+            --target bun \
+            --splitting
+      - uses: jcbhmr/configure-bun-action@v0.1.0
       - id: main
         uses: ./
         with:

@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions4git/setup-git@v1
-      - uses: jcbhmr/configure-bun-action@v1
+      - uses: jcbhmr/configure-bun-action@v0.1.0
       - run: git commit -m 'Build'
       - run: git tag -f "$TAG"
         env:
