@@ -27,7 +27,7 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
 function coreDebug(x) {
-  if (process.env.BUN_DEBUG) {
+  if (["1", "true"].includes(process.env.BUN_DEBUG)) {
     console.log(x.replaceAll(/^/mg, "::debug::"));
   }
 }

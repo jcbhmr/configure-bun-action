@@ -27,6 +27,8 @@ jobs:
       - run: cat test/bun0/_pre.mjs
       - run: cat test/bun0/_post.mjs
       - uses: ./test/bun0
+        env:
+          BUN_DEBUG: true
   bun1:
     strategy:
       fail-fast: false
@@ -50,3 +52,5 @@ jobs:
       - run: cat test/bun1/_pre.mjs
       - run: cat test/bun1/_post.mjs
       - uses: ./test/bun1
+        env:
+          BUN_DEBUG: true
