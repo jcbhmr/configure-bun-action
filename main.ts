@@ -27,13 +27,13 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
 function escapeData(s) {
-  return toCommandValue(s)
+  return s
     .replace(/%/g, '%25')
     .replace(/\\r/g, '%0D')
     .replace(/\\n/g, '%0A')
 }
 function escapeProperty(s) {
-  return toCommandValue(s)
+  return s
     .replace(/%/g, '%25')
     .replace(/\\r/g, '%0D')
     .replace(/\\n/g, '%0A')
