@@ -96,7 +96,7 @@ const postTemplate = mainTemplate;
 async function getAllBunTags() {
   const token = core.getInput("token");
   const octokit = token ? github.getOctokit(token) : new Octokit(); // TODO: https://www.npmjs.com/package/@octokit/auth-unauthenticated
-  const releases = octokit.paginate(octokit.rest.repos.listReleases, {
+  const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
     owner: "oven-sh",
     repo: "bun",
   });
