@@ -1,6 +1,25 @@
 ## Usage
 
 ```yml
+# action.yml
+name: Hello world!
+description: 👋 Greet someone and record the time
+
+inputs:
+  name:
+    description: Who to greet
+    default: ${{ github.actor }}
+
+outputs:
+  time:
+    description: The time we greeted you
+
+runs:
+  using: bun1
+  main: main.ts
+```
+
+```yml
 # .github/workflows/publish-action.yml
 name: publish-action
 on:
@@ -14,14 +33,49 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jcbhmr/configure-bun-action@v1
-      - uses: jcbhmr/update-release@v1
+      - uses: # SOMETHING
       - uses: actions/publish-action@v0.2.2
         with:
           source-tag: ${{ github.event.release.tag_name }}
 ```
 
-### Limitations
+```yml
+# action.yml
+name: Hello world!
+description: 👋 Greet someone and record the time
 
-- You need an internet connection to fetch the latest available version of Bun. This can take time or fail completely.
+inputs:
+  name:
+    description: Who to greet
+    default: ${{ github.actor }}
 
-- You need to actually _use this jcbhmr/configure-bun-action action_ and it's not as simple as native Node.js. Then again, Node.js still often requires a bundling step so it's your choice where to put the complexity.
+outputs:
+  time:
+    description: The time we greeted you
+
+runs:
+  using: bun1
+  main: dist/main.js
+```
+
+```yml
+# .github/workflows/publish-action.yml
+name: publish-action
+on:
+  release:
+    types: released
+jobs:
+  publish-action:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - uses: jcbhmr/configure-bun-action@v1
+      - run: bun build --entrypoints ./index.ts --outdir ./out --target bun --splitting
+      - uses: # SOMETHING
+      - uses: actions/publish-action@v0.2.2
+        with:
+          source-tag: ${{ github.event.release.tag_name }}
+```
