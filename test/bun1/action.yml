@@ -11,7 +11,7 @@ outputs:
     description: The time we greeted you
 
 runs:
-  using: bun0
+  using: bun1
   main: main.ts
   pre: pre.ts
   post: post.ts
