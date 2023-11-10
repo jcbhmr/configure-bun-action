@@ -27,6 +27,7 @@ jobs:
       - run: cat test/bun0/_main.mjs
       - run: cat test/bun0/_pre.mjs
       - run: cat test/bun0/_post.mjs
+      - uses: ./test/bun0
   bun1:
     strategy:
       fail-fast: false
@@ -50,3 +51,4 @@ jobs:
       - run: cat test/bun1/_main.mjs
       - run: cat test/bun1/_pre.mjs
       - run: cat test/bun1/_post.mjs
+      - uses: ./test/bun1
