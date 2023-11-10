@@ -28,7 +28,7 @@ import assert from "node:assert/strict";
 
 function coreDebug(x) {
   if (["1", "true"].includes(process.env.BUN_DEBUG)) {
-    console.log(x.replaceAll(/^/mg, "::debug::"));
+    console.log(x.replaceAll(/^/mg, "::debug::configure-bun-action    "));
   }
 }
 
