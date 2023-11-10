@@ -34,7 +34,7 @@ function coreDebug(x) {
 
 function semverLt(a, b) {
   const [aMajor, aMinor, aPatch] = a.split(".").map((x) => parseInt(x));
-  const [aMajor, aMinor, aPatch] = b.split(".").map((x) => parseInt(x));
+  const [bMajor, bMinor, bPatch] = b.split(".").map((x) => parseInt(x));
   if (aMajor < bMajor) {
     return true;
   } else if (aMajor > bMajor) {
@@ -209,14 +209,21 @@ const variant = core.getInput("variant");
 core.debug(`avx2=${avx2}`);
 core.debug(`variant=${variant}`);
 
-const tags = await getAllBunTags();
-const range = action.runs.using === "bun0" ? "^0.0.0" : "^1.0.0";
-const versions = tags.map((x) => semver.coerce(x));
-const version = semver.maxSatisfying(versions, range);
-const tag = tags[versions.indexOf(version)];
-core.debug(`tags=${JSON.stringify(tags)}`);
-core.debug(`range=${range}`);
-core.debug(`versions=${JSON.stringify(versions)}`);
+let version: string;
+let tag: string;
+if (action.runs.using === "bun0") {
+  version = "0.8.1";
+  tag = "bun-v0.8.1";
+} else {
+  const tags = await getAllBunTags();
+  const versions = tags.map(
+    (x) => x.match(/^bun-v(\\d+\\.\\d+\\.\\d+)$/)?.[1] ?? ""
+  );
+  core.debug(`tags=${JSON.stringify(tags)}`);
+  core.debug(`versions=${JSON.stringify(versions)}`);
+  version = semver.maxSatisfying(versions, "^1.0.0");
+  tag = tags[versions.indexOf(version)];
+}
 core.debug(`version=${version}`);
 core.debug(`tag=${tag}`);
 core.info(`Using Bun v${version}`);
