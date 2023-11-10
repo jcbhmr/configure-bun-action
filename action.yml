@@ -1,4 +1,6 @@
 inputs:
+  token:
+    default: ${{ github.token }}
   path:
     default: .
   avx2:
@@ -13,6 +15,7 @@ runs:
     - shell: bash
       run: bun "$GITHUB_ACTION_PATH/main.ts"
       env:
+        INPUT_TOKEN: ${{ inputs.token }}
         INPUT_PATH: ${{ inputs.path }}
         INPUT_AVX2: ${{ inputs.avx2 }}
         INPUT_VARIANT: ${{ inputs.variant }}
