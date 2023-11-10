@@ -76,6 +76,10 @@ const localBunVersion = ${JSON.stringify(localBunVersion)};
 coreDebug(\`fileRelativePath=\${fileRelativePath}\`)
 coreDebug(\`localBunVersion=\${localBunVersion}\`)
 
+if (semverLt(localBunVersion, "1.0.0")) {
+  console.log("::warn title=bun0 is deprecated::bun0 is deprecated. Please use bun1 instead.");
+}
+
 const rootPath = fileURLToPath(import.meta.resolve("./"));
 const filePath = join(rootPath, fileRelativePath);
 const targetName = \`\${process.env.RUNNER_OS.toLowerCase()}-\${process.env.RUNNER_ARCH.toLowerCase()}\`;
@@ -111,8 +115,7 @@ const preTemplate = mainTemplate;
 const postTemplate = mainTemplate;
 
 async function getAllBunTags() {
-  const token = core.getInput("token");
-  const octokit = token ? github.getOctokit(token) : new Octokit(); // TODO: https://www.npmjs.com/package/@octokit/auth-unauthenticated
+  const octokit = github.getOctokit(core.getInput("token"));
   const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
     owner: "oven-sh",
     repo: "bun",
