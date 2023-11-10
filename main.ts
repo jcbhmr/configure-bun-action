@@ -15,6 +15,7 @@ import * as YAML from "yaml";
 import { $ } from "execa";
 import assert from "node:assert/strict";
 import * as github from "@actions/github";
+import * as semver from "semver";
 
 const mainTemplate = (fileRelativePath: string, localBunVersion: string) => `\
 const fileRelativePath = ${JSON.stringify(fileRelativePath)};
