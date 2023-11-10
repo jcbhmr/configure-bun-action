@@ -14,6 +14,7 @@ import * as tc from "@actions/tool-cache";
 import * as YAML from "yaml";
 import { $ } from "execa";
 import assert from "node:assert/strict";
+import * as github from "@actions/github";
 
 const mainTemplate = (fileRelativePath: string, localBunVersion: string) => `\
 const fileRelativePath = ${JSON.stringify(fileRelativePath)};
