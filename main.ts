@@ -26,13 +26,13 @@ import { cp, mkdir, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
-function escapeData(s: any): string {
+function escapeData(s) {
   return toCommandValue(s)
     .replace(/%/g, '%25')
     .replace(/\\r/g, '%0D')
     .replace(/\\n/g, '%0A')
 }
-function escapeProperty(s: any): string {
+function escapeProperty(s) {
   return toCommandValue(s)
     .replace(/%/g, '%25')
     .replace(/\\r/g, '%0D')
@@ -84,6 +84,7 @@ async function getAllToolCacheBunVersions() {
   const toolCacheBunIndexPath = join(process.env.RUNNER_TOOL_CACHE, "bun");
   const dirNames = await readdir(toolCacheBunIndexPath).catch(() => []);
   const versions = dirNames.flatMap((x) => x.match(/^v?(\\d+\\.\\d+\\.\\d+)$/)?.[1] ?? []);
+  versions.sort(semverCompare);
   coreDebug(\`getAllToolCacheBunVersions()=\${JSON.stringify(versions)}\`)
   return versions;
 }
@@ -92,10 +93,6 @@ const fileRelativePath = ${JSON.stringify(fileRelativePath)};
 const localBunVersion = ${JSON.stringify(localBunVersion)};
 coreDebug(\`fileRelativePath=\${fileRelativePath}\`)
 coreDebug(\`localBunVersion=\${localBunVersion}\`)
-
-if (semverLt(localBunVersion, "1.0.0")) {
-  coreWarn("bun0 is deprecated. Please upgrade.");
-}
 
 const rootPath = fileURLToPath(import.meta.resolve("./"));
 const filePath = join(rootPath, fileRelativePath);
@@ -118,10 +115,15 @@ if (!existsSync(copyLocalBunInstallToPath)) {
   await cp(localBunInstallPath, copyLocalBunInstallToPath, { recursive: true });
   coreDebug(\`copied \${localBunInstallPath} to \${copyLocalBunInstallToPath}\`)
 }
-const bestToolCacheBunVersion = semverMaxSatisfying(await getAllToolCacheBunVersions(), "^" + localBunVersion);
+const allToolCacheBunVersions = await getAllToolCacheBunVersions();
+const bestToolCacheBunVersion = semverMaxSatisfying(allToolCacheBunVersions, "^" + localBunVersion);
 const bestBunPath = bunPathFor(toolCacheBunInstallPathFor(bestToolCacheBunVersion));
 coreDebug(\`bestToolCacheBunVersion=\${bestToolCacheBunVersion}\`)
 coreDebug(\`bestBunPath=\${bestBunPath}\`)
+
+if (semverLt(bestToolCacheBunVersion, "1.0.0")) {
+  coreWarn("bun0 is deprecated. Please upgrade to bun1.");
+}
 
 const bunChildProcess = spawn(bestBunPath, [filePath], { stdio: "inherit" });
 const [bunExitCode] = await once(bunChildProcess, "exit");
