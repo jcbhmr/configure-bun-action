@@ -13,9 +13,11 @@ import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { join, dirname } from "node:path";
 import { existsSync } from "node:fs";
+import assert from "node:assert/strict";
 const file = join(dirname(process.argv[1]), ${JSON.stringify(file)});
 // https://github.com/oven-sh/bun/issues/6964
 const response = await fetch("https://raw.githubusercontent.com/jcbhmr/bun-versions/main/versions.json");
+assert(response.ok, \`\${response.status} \${response.url}\`);
 const json = await response.json();
 const TAG = json.bun.find((x) => x.startsWith("bun-v0."));
 const version = TAG.slice(5);
@@ -32,8 +34,8 @@ const subprocess2 = spawn(join(BUN_INSTALL, "bin", "bun"), [file], { stdio: "inh
 process.exitCode = (await once(subprocess2, "exit"))[0];
 `;
 
-export default async function bun1(root: string, action: any) {
-  assert(action.runs.using === "bun1", "must be bun1");
+export default async function bun0(root: string, action: any) {
+  assert(action.runs.using === "bun0", "must be bun0");
 
   action.runs.using = "node20";
 

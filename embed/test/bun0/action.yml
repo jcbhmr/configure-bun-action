@@ -1,5 +1,0 @@
-runs:
-  using: bun0
-  main: main.ts
-  pre: pre.ts
-  post: post.ts
