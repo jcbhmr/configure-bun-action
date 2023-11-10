@@ -26,10 +26,27 @@ import { cp, mkdir, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
+function escapeData(s: any): string {
+  return toCommandValue(s)
+    .replace(/%/g, '%25')
+    .replace(/\\r/g, '%0D')
+    .replace(/\\n/g, '%0A')
+}
+function escapeProperty(s: any): string {
+  return toCommandValue(s)
+    .replace(/%/g, '%25')
+    .replace(/\\r/g, '%0D')
+    .replace(/\\n/g, '%0A')
+    .replace(/:/g, '%3A')
+    .replace(/,/g, '%2C')
+}
 function coreDebug(x) {
   if (["1", "true"].includes(process.env.BUN_DEBUG)) {
-    console.log(x.replaceAll(/^/mg, "::debug::configure-bun-action    "));
+    console.log(\`::debug::\${escapeData("jcbhmr/configure-bun-action\n" + x}\`);
   }
+}
+functioni coreWarn(x) {
+  console.log(\`::warning::\${escapeData("jcbhmr/configure-bun-action\n" + x}\`);
 }
 
 function semverLt(a, b) {
@@ -77,7 +94,7 @@ coreDebug(\`fileRelativePath=\${fileRelativePath}\`)
 coreDebug(\`localBunVersion=\${localBunVersion}\`)
 
 if (semverLt(localBunVersion, "1.0.0")) {
-  console.log("::warn title=bun0 is deprecated::bun0 is deprecated. Please use bun1 instead.");
+  coreWarn("bun0 is deprecated. Please upgrade.");
 }
 
 const rootPath = fileURLToPath(import.meta.resolve("./"));
