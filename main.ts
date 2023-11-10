@@ -166,12 +166,14 @@ async function installBun(
   core.debug(`bin=${bin}`);
   core.debug(`exe=${exe}`);
 
+  core.info(`Downloading Bun from ${bunURI}`);
   await tc.downloadTool(bunURI, `${exe}.zip`);
   await tc.extractZip(`${exe}.zip`, bin);
-
   core.debug(`moving ${join(bin, `bun-${target}`, exeName)} to ${exe}`);
   await rename(join(bin, `bun-${target}`, exeName), exe);
+  core.debug(`chmod 0o755 ${exe}`);
   await chmod(exe, 0o755);
+  core.debug(`rm -r ${join(bin, `bun-${target}`)}`);
   await rm(join(bin, `bun-${target}`), { recursive: true });
   core.info(`Installed Bun to ${exe}`);
 }
