@@ -22,7 +22,6 @@ jobs:
       - shell: jq -C . {0}
         run: ${{ toJSON(steps.main.outputs) }}
       - run: ls -A test/bun0
-      - run: ls -A test/bun0/.bun
       - run: cat test/bun0/action.yml
       - run: cat test/bun0/_main.mjs
       - run: cat test/bun0/_pre.mjs
@@ -46,7 +45,6 @@ jobs:
       - shell: jq -C . {0}
         run: ${{ toJSON(steps.main.outputs) }}
       - run: ls -A test/bun1
-      - run: ls -A test/bun1/.bun
       - run: cat test/bun1/action.yml
       - run: cat test/bun1/_main.mjs
       - run: cat test/bun1/_pre.mjs
