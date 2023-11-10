@@ -42,11 +42,11 @@ function escapeProperty(s) {
 }
 function coreDebug(x) {
   if (["1", "true"].includes(process.env.BUN_DEBUG)) {
-    console.log(\`::debug::\${escapeData("jcbhmr/configure-bun-action\n" + x}\`);
+    console.log(\`::debug::\${escapeData("jcbhmr/configure-bun-action\\n" + x}\`);
   }
 }
 functioni coreWarn(x) {
-  console.log(\`::warning::\${escapeData("jcbhmr/configure-bun-action\n" + x}\`);
+  console.log(\`::warning::\${escapeData("jcbhmr/configure-bun-action\\n" + x}\`);
 }
 
 function semverLt(a, b) {
