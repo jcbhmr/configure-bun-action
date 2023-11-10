@@ -14,23 +14,37 @@ import { once } from "node:events";
 import { join, dirname } from "node:path";
 import { existsSync } from "node:fs";
 import assert from "node:assert/strict";
-const file = join(dirname(process.argv[1]), ${JSON.stringify(file)});
-// https://github.com/oven-sh/bun/issues/6964
-const response = await fetch("https://raw.githubusercontent.com/jcbhmr/bun-versions/main/versions.json");
-assert(response.ok, \`\${response.status} \${response.url}\`);
-const json = await response.json();
-const TAG = json.bun.find((x) => x.startsWith("bun-v0."));
-const version = TAG.slice(5);
-const BUN_INSTALL = join(process.env.RUNNER_TOOL_CACHE, "bun", version, process.arch);
-if (!existsSync(BUN_INSTALL)) {
-  const subprocess1 = spawn(
-    \`curl -fsSL https://bun.sh/install | bash -s "$TAG"\`,
-    { shell: "bash", env: { ...process.env, BUN_INSTALL, TAG } }
-  );
-  process.exitCode = (await once(subprocess1, "exit"))[0];
-  process.exitCode && process.exit();
+const root = dirname(process.argv[1]);
+const file = join(root, ${JSON.stringify(file)});
+let bun;
+try {
+  const signal = AbortSignal.timeout(6000);
+  // https://github.com/oven-sh/bun/issues/6964
+  const response = await fetch("https://raw.githubusercontent.com/jcbhmr/bun-versions/main/versions.json", { signal });
+  assert(response.ok, \`\${response.status} \${response.url}\`);
+  const json = await response.json();
+  const TAG = json.bun.find((x) => x.startsWith("bun-v0."));
+  const version = TAG.slice(5);
+  const BUN_INSTALL = join(process.env.RUNNER_TOOL_CACHE, "bun", version, process.arch);
+  if (!existsSync(BUN_INSTALL)) {
+    const subprocess1 = spawn(
+      \`curl -fsSL https://bun.sh/install | bash -s "$TAG"\`,
+      { shell: "bash", env: { ...process.env, BUN_INSTALL, TAG }, signal }
+    );
+    const [exitCode] = await once(subprocess1, "exit");
+    if (exitCode) {
+      throw new DOMException(\`bun.sh/install exited with code \${exitCode}\`, "OperationError");
+    }
+  }
+  bun = join(BUN_INSTALL, "bin", "bun");
+} catch (error) {
+  if (process.env.RUNNER_DEBUG === "1") {
+    console.error(error);
+  }
+  const target = \`\${process.env.RUNNER_OS.toLowerCase()}-\${process.env.RUNNER_ARCH.toLowerCase()}\`;
+  bun = join(root, ".bun", target, "bun");
 }
-const subprocess2 = spawn(join(BUN_INSTALL, "bin", "bun"), [file], { stdio: "inherit" });
+const subprocess2 = spawn(bun, [file], { stdio: "inherit" });
 process.exitCode = (await once(subprocess2, "exit"))[0];
 `;
 

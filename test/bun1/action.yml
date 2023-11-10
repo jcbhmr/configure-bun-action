@@ -1,5 +1,17 @@
+name: Hello world!
+description: 👋 Greet someone and record the time
+
+inputs:
+  name:
+    description: Who to greet
+    default: ${{ github.actor }}
+
+outputs:
+  time:
+    description: The time we greeted you
+
 runs:
-  using: bun1
+  using: bun0
   main: main.ts
   pre: pre.ts
   post: post.ts
