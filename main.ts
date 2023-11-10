@@ -216,18 +216,21 @@ if (action.runs.using === "bun0") {
   tag = "bun-v0.8.1";
 } else {
   const tags = await getAllBunTags();
-  const versions = tags.map(
-    (x) => x.match(/^bun-v(\\d+\\.\\d+\\.\\d+)$/)?.[1] ?? ""
-  );
+  const versions = tags.map((x) => x.match(/^bun-v(\\d+\\.\\d+\\.\\d+)$/)?.[1]);
+  const goodVersions = versions.filter((x) => x);
   core.debug(`tags=${JSON.stringify(tags)}`);
   core.debug(`versions=${JSON.stringify(versions)}`);
-  version = semver.maxSatisfying(versions, "^1.0.0");
+  core.debug(`goodVersions=${JSON.stringify(goodVersions)}`);
+
+  version = semver.maxSatisfying(goodVersions, "^1.0.0");
   tag = tags[versions.indexOf(version)];
 }
 core.debug(`version=${version}`);
 core.debug(`tag=${tag}`);
-core.info(`Using Bun v${version}`);
+assert.notEqual(version, null);
+assert.notEqual(tag, null);
 
+core.info(`Using Bun v${version}`);
 const permutations = [
   { os: "Linux", arch: "X64" },
   { os: "Linux", arch: "ARM64" },
