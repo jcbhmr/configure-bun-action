@@ -1,6 +1,10 @@
 inputs:
   path:
     default: .
+  avx2:
+    default: true
+  variant:
+    default: ""
 
 runs:
   using: composite
@@ -10,3 +14,5 @@ runs:
       run: bun "$GITHUB_ACTION_PATH/main.ts"
       env:
         INPUT_PATH: ${{ inputs.path }}
+        INPUT_AVX2: ${{ inputs.avx2 }}
+        INPUT_VARIANT: ${{ inputs.variant }}
