@@ -9,8 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions4git/setup-git@v1
       - uses: jcbhmr/configure-bun-action@v1
-      - uses: actions4git/update-tag@v1
+      - run: git commit -m 'Build'
+      - run: git tag -f "$TAG"
+        env:
+          TAG: github.event.release.tag_name
+      - run: git push -f origin "$TAG"
+        env:
+          TAG: github.event.release.tag_name
       - uses: actions/publish-action@v0.2.2
         with:
           source-tag: ${{ github.event.release.tag_name }}
