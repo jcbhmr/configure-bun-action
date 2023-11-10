@@ -10,4 +10,4 @@ inputs:
 
 runs:
   using: bun1
-  main: dist/main.js
+  main: out/main.js
