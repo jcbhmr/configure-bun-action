@@ -216,7 +216,7 @@ if (action.runs.using === "bun0") {
   tag = "bun-v0.8.1";
 } else {
   const tags = await getAllBunTags();
-  const versions = tags.map((x) => x.match(/^bun-v(\\d+\\.\\d+\\.\\d+)$/)?.[1]);
+  const versions = tags.map((x) => x.match(/^bun-v(\d+\.\d+\.\d+)$/)?.[1]);
   const goodVersions = versions.filter((x) => x);
   core.debug(`tags=${JSON.stringify(tags)}`);
   core.debug(`versions=${JSON.stringify(versions)}`);
