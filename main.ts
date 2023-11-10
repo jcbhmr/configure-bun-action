@@ -57,7 +57,7 @@ function semverCompare(a, b) {
   return 0;
 }
 function semverMaxSatisfying(versions, range) {
-  const major = range.match(/^\\^(\\d+)\\.0\\.0$/)[1];
+  const major = range.match(/^\\^(\\d+)\\.(\\d+)\\.(\\d+)$/)[1];
   const inMajor = versions.filter((x) => x.startsWith(major + "."));
   inMajor.sort(semverCompare);
   return inMajor.at(-1);
