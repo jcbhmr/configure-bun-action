@@ -27,7 +27,9 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
 function coreDebug(x) {
-  console.log(x.replaceAll(/^/mg, "::debug::"));
+  if (process.env.BUN_DEBUG) {
+    console.log(x.replaceAll(/^/mg, "::debug::"));
+  }
 }
 
 function semverLt(a, b) {
@@ -135,7 +137,7 @@ async function installBun(
   }
 
   let target = {
-    "macOS,X64": "darwin-64",
+    "macOS,X64": "darwin-x64",
     "macOS,ARM64": "darwin-aarch64",
     "Linux,ARM64": "linux-aarch64",
     "Linux,X64": "linux-x64",
