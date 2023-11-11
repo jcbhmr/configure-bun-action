@@ -17,7 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
       - run: bun install --frozen-lockfile
-      - run: bun build --target=bun --splitting --outdir=out ./main.ts
+      - run: |
+          bun build --target=bun --splitting --outdir=out ./main.ts --sourcemap=inline
       - uses: jcbhmr/configure-bun-action@v0.1.0
       - id: main
         uses: ./
@@ -46,7 +47,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
       - run: bun install --frozen-lockfile
-      - run: bun build --target=bun --splitting --outdir=out ./main.ts
+      - run: |
+          bun build --target=bun --splitting --outdir=out ./main.ts --sourcemap=inline
       - uses: jcbhmr/configure-bun-action@v0.1.0
       - id: main
         uses: ./
