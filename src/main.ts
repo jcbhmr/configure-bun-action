@@ -9,7 +9,7 @@ import * as github from "@actions/github";
 import * as prebun from "./lib/prebun.ts";
 import cookiecutter from "./lib/cookiecutter.ts";
 import { fileURLToPath } from "node:url";
-import.meta.resolve = import.meta.resolveSync;
+import.meta.resolve = (s) => new URL(s, import.meta.url).href;
 
 const rootPath = resolve(core.getInput("path"));
 
