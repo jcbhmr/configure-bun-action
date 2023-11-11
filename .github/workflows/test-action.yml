@@ -35,7 +35,7 @@ jobs:
       - run: |
           bun build --target=bun --splitting --outdir=out --sourcemap=inline \
             src/main.ts
-      - uses: jcbhmr/configure-bun-action@v0.3.0
+      - uses: jcbhmr/configure-bun-action@v0.1.0
       - id: main
         uses: ./
         with:
@@ -67,7 +67,7 @@ jobs:
       - run: |
           bun build --target=bun --splitting --outdir=out --sourcemap=inline \
             src/main.ts
-      - uses: jcbhmr/configure-bun-action@v0.3.0
+      - uses: jcbhmr/configure-bun-action@v0.1.0
       - id: main
         uses: ./
         with:
