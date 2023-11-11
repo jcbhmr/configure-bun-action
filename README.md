@@ -81,6 +81,10 @@ jobs:
           source-tag: ${{ github.event.release.tag_name }}
 ```
 
+### Limitations
+
+- There's a ~50ms startup delay from the Node.js wrapper.
+
 ## How it works
 
 There are three native GitHub Actions runtimes: Node.js (`using: node20` or
