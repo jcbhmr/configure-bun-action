@@ -12,6 +12,6 @@ export default async function cookiecutter(src, dest, vars) {
   } else {
     let text = await readFile(src, "utf8");
     text = text.replace(/__(\w+)__/g, (m, x) => vars[x] || m);
-    await writeFile(join(dirname(dest), basename(src)));
+    await writeFile(join(dirname(dest), basename(src)), text);
   }
 }
