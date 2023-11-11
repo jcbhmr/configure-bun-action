@@ -52,7 +52,7 @@ const { main, pre, post } = action.runs;
 const { version, tag } = await params[action.runs.using]();
 
 await cookiecutter(
-  fileURLToPath(import.meta.resolve("./templates/.bun/")),
+  fileURLToPath(import.meta.resolve("../templates/.bun/")),
   join(rootPath, ".bun"),
   {
     __MAIN__: JSON.stringify(main),
