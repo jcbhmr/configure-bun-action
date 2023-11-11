@@ -4,10 +4,10 @@ import { join, dirname, resolve } from "node:path";
 import * as core from "@actions/core";
 import * as tc from "@actions/tool-cache";
 import * as YAML from "yaml";
-import { $ } from "execa";
 import assert from "node:assert/strict";
 import * as github from "@actions/github";
-import * as bun from "./bun.ts";
+import * as prebun from "./lib/prebun.ts";
+import cookiecutter from "./lib/cookiecutter.ts";
 
 const rootPath = resolve(core.getInput("path"));
 
@@ -53,7 +53,10 @@ await cookiecutter(
   Bun.fileURLToPath(import.meta.resolve("./templates/.bun/")),
   join(rootPath, ".bun"),
   {
-    // vars!
+    __MAIN__: JSON.stringify(main),
+    __PRE__: JSON.stringify(pre),
+    __POST__: JSON.stringify(post),
+    __LOCAL_BUN_VERSION__: JSON.stringify(version),
   }
 );
 const permutations: any[] = [
@@ -64,12 +67,16 @@ const permutations: any[] = [
 ];
 for (const { os, arch, avx2, variant } of permutations) {
   const bunInstall = join(rootPath, ".bun", `${os}-${arch}`);
-  await bun.install(bunInstall, tag, os, arch, avx2, variant);
+  await prebun.install(bunInstall, tag, os, arch, avx2, variant);
 }
 
 action.runs.using = "node20";
 action.runs.main = ".bun/main.mjs";
-action.runs.pre &&= ".bun/pre.mjs";
-action.runs.post &&= ".bun/post.mjs";
+if (pre != null) {
+  action.runs.pre = ".bun/pre.mjs";
+}
+if (post != null) {
+  action.runs.post = ".bun/post.mjs";
+}
 
 await writeFile(actionPath, YAML.stringify(action));

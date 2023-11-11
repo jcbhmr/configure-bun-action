@@ -8,6 +8,7 @@ inputs:
     default: .
 
 # https://github.com/jcbhmr/configure-bun-action
+# See build step in GitHub workflows
 runs:
   using: bun1
   main: out/main.js
