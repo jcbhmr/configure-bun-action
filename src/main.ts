@@ -6,8 +6,8 @@ import * as tc from "@actions/tool-cache";
 import * as YAML from "yaml";
 import assert from "node:assert/strict";
 import * as github from "@actions/github";
-import * as prebun from "./lib/prebun.ts";
-import cookiecutter from "./lib/cookiecutter.ts";
+import * as prebun from "./prebun.ts";
+import cookiecutter from "./cookiecutter.ts";
 import { fileURLToPath } from "node:url";
 import.meta.resolve = (s) => new URL(s, import.meta.url).href;
 
@@ -33,9 +33,7 @@ const params = {
     let versions = Object.keys(versionTags);
     versions.sort(Bun.semver.order);
     versions = versions.filter((x) => Bun.semver.satisfies(x, "^1.0.0"));
-    assert.notEqual(versions.length, 0, {
-      toString: () => JSON.stringify(versionTags),
-    });
+    assert.notEqual(versions.length, 0);
     const version = versions.at(-1)!;
     const tag = versionTags[version];
     return { version, tag };
