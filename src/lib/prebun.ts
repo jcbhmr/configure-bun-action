@@ -50,44 +50,12 @@ async function supportsAVX2() {
 
 async function install(
   bunInstallPath: string,
-  tag: string | undefined = undefined,
-  os: "Windows" | "Linux" | "macOS" | undefined = undefined,
-  arch: "X64" | "X86" | "ARM64" | "ARM" | undefined = undefined,
+  tag: string,
+  os: "Windows" | "Linux" | "macOS",
+  arch: "X64" | "X86" | "ARM64" | "ARM",
   avx2: boolean | undefined = undefined,
   variant: "debug-info" | null = null
 ) {
-  if (tag === undefined) {
-    const verionTags = await fetchVersionTagMap();
-    const versions = Object.keys(verionTags);
-    versions.sort(Bun.semver.order);
-    assert.notEqual(versions.length, 0);
-    const latestVersion = versions.at(-1)!;
-    tag = verionTags[latestVersion];
-  }
-  core.debug(`tag=${tag}`);
-
-  if ([os, arch, avx2].some((x) => x === undefined)) {
-    assert([os, arch, avx2].every((x) => x === undefined));
-    // @ts-ignore
-    os = {
-      win32: "Windows",
-      linux: "Linux",
-      darwin: "macOS",
-    }[process.platform]!;
-    // @ts-ignore
-    arch = {
-      x64: "X64",
-      x32: "X86",
-      arm64: "ARM64",
-      arm: "ARM",
-    }[process.arch]!;
-    avx2 = (await supportsAVX2()) ?? false;
-  }
-  core.debug(`os=${os}`);
-  core.debug(`arch=${arch}`);
-  core.debug(`avx2=${avx2}`);
-  core.debug(`variant=${variant}`);
-
   if (os === "Windows") {
     throw new DOMException(
       "No Bun installation available for Windows",
@@ -102,13 +70,13 @@ async function install(
     "Linux,X64": "linux-x64",
   }[[os, arch].toString()];
   if (target === "darwin-x64") {
-    avx2 ??= true;
+    assert.notEqual(avx2, undefined)
     if (!avx2) {
       target = "darwin-x64-baseline";
     }
   }
   if (target === "linux-x64") {
-    avx2 ??= true;
+    assert.notEqual(avx2, undefined)
     if (!avx2) {
       target = "linux-x64-baseline";
     }
