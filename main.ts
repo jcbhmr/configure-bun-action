@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import * as github from "@actions/github";
 import * as prebun from "./lib/prebun.ts";
 import cookiecutter from "./lib/cookiecutter.ts";
+import { fileURLToPath } from "node:url";
 
 const rootPath = resolve(core.getInput("path"));
 
@@ -50,7 +51,7 @@ const { main, pre, post } = action.runs;
 const { version, tag } = await params[action.runs.using]();
 
 await cookiecutter(
-  Bun.fileURLToPath(import.meta.resolve("./templates/.bun/")),
+  fileURLToPath(import.meta.resolve("./templates/.bun/")),
   join(rootPath, ".bun"),
   {
     __MAIN__: JSON.stringify(main),

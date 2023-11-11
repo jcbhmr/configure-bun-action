@@ -1,5 +1,5 @@
 // @ts-check
-//#region https://chat.openai.com/share/72638868-9b3c-4ac7-9b67-be3f258ca287
+// https://chat.openai.com/share/72638868-9b3c-4ac7-9b67-be3f258ca287
 // semver.mjs
 
 function isValidSemver(version) {
@@ -153,6 +153,3 @@ export const semver = {
   satisfies,
   order,
 };
-//#endregion
-
-export { fileURLToPath } from "node:url";
