@@ -11,7 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jcbhmr/configure-bun-action@v0.1.0
-      - uses: jcbhmr/add-commit-push@v1
+      - uses: jcbhmr/add-commit@v1
+      - uses: jcbhmr/update-tag@v1
       - uses: actions/publish-action@v0.2.2
         with:
           source-tag: ${{ github.event.release.tag_name }}
