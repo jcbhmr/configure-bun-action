@@ -11,4 +11,5 @@ inputs:
 # See build step in GitHub workflows
 runs:
   using: bun1
-  main: out/main.js
+  # main: out/main.js
+  main: src/main.ts
