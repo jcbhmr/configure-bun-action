@@ -33,7 +33,7 @@ const params = {
     let versions = Object.keys(versionTags);
     versions.sort(Bun.semver.order);
     versions = versions.filter((x) => Bun.semver.satisfies(x, "^1.0.0"));
-    assert.notEqual(versions.length, 0);
+    assert.notEqual(versions.length, 0, { toString: () => JSON.stringify(versionTags) });
     const version = versions.at(-1)!;
     const tag = versionTags[version];
     return { version, tag };
