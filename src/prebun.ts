@@ -104,6 +104,7 @@ async function install(
   await chmod(exe, 0o755);
   core.debug(`rm -r ${join(bin, `bun-${target}`)}`);
   await rm(join(bin, `bun-${target}`), { recursive: true });
+  await rm(`${exe}.zip`);
   core.info(`Installed Bun to ${exe}`);
 }
 
