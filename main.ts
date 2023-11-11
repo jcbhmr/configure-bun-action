@@ -15,190 +15,7 @@ import * as YAML from "yaml";
 import { $ } from "execa";
 import assert from "node:assert/strict";
 import * as github from "@actions/github";
-import * as semver from "semver";
-
-const mainTemplate = (fileRelativePath: string, localBunVersion: string) => `\
-import { spawn } from "node:child_process";
-import { once } from "node:events";
-import { join, dirname } from "node:path";
-import { existsSync } from "node:fs";
-import { cp, mkdir, readdir } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import assert from "node:assert/strict";
-
-function escapeData(s) {
-  return s
-    .replace(/%/g, '%25')
-    .replace(/\\r/g, '%0D')
-    .replace(/\\n/g, '%0A')
-}
-function escapeProperty(s) {
-  return s
-    .replace(/%/g, '%25')
-    .replace(/\\r/g, '%0D')
-    .replace(/\\n/g, '%0A')
-    .replace(/:/g, '%3A')
-    .replace(/,/g, '%2C')
-}
-function coreDebug(x) {
-  if (["1", "true"].includes(process.env.BUN_DEBUG)) {
-    console.log(\`::debug::\${escapeData("jcbhmr/configure-bun-action\\n" + x)}\`);
-  }
-}
-function coreWarn(x) {
-  console.log(\`::warning::\${escapeData("jcbhmr/configure-bun-action\\n" + x)}\`);
-}
-
-function semverLt(a, b) {
-  const [aMajor, aMinor, aPatch] = a.split(".").map((x) => parseInt(x));
-  const [bMajor, bMinor, bPatch] = b.split(".").map((x) => parseInt(x));
-  if (aMajor < bMajor) {
-    return true;
-  } else if (aMajor > bMajor) {
-    return false;
-  }
-  if (aMinor < bMinor) {
-    return true;
-  } else if (aMinor > bMinor) {
-    return false;
-  }
-  return aPatch < bPatch;
-}
-const semverGt = (a, b) => !semverLt(a, b) && a !== b;
-function semverCompare(a, b) {
-  if (semverLt(a, b)) {
-    return -1;
-  } else if (semverGt(a, b)) {
-    return 1;
-  }
-  return 0;
-}
-function semverMaxSatisfying(versions, range) {
-  const major = range.match(/^\\^(\\d+)\\.(\\d+)\\.(\\d+)$/)[1];
-  const inMajor = versions.filter((x) => x.startsWith(major + "."));
-  inMajor.sort(semverCompare);
-  return inMajor.at(-1);
-}
-
-async function getAllToolCacheBunVersions() {
-  const toolCacheBunIndexPath = join(process.env.RUNNER_TOOL_CACHE, "bun");
-  const dirNames = await readdir(toolCacheBunIndexPath).catch(() => []);
-  const versions = dirNames.flatMap((x) => x.match(/^v?(\\d+\\.\\d+\\.\\d+)$/)?.[1] ?? []);
-  versions.sort(semverCompare);
-  coreDebug(\`getAllToolCacheBunVersions()=\${JSON.stringify(versions)}\`)
-  return versions;
-}
-
-const fileRelativePath = ${JSON.stringify(fileRelativePath)};
-const localBunVersion = ${JSON.stringify(localBunVersion)};
-coreDebug(\`fileRelativePath=\${fileRelativePath}\`)
-coreDebug(\`localBunVersion=\${localBunVersion}\`)
-
-const rootPath = fileURLToPath(import.meta.resolve("./"));
-const filePath = join(rootPath, fileRelativePath);
-const targetName = \`\${process.env.RUNNER_OS.toLowerCase()}-\${process.env.RUNNER_ARCH.toLowerCase()}\`;
-const exeExt = process.platform === "windows" ? ".exe" : "";
-coreDebug(\`rootPath=\${rootPath}\`)
-coreDebug(\`filePath=\${filePath}\`)
-coreDebug(\`targetName=\${targetName}\`)
-coreDebug(\`exeExt=\${exeExt}\`)
-
-const localBunInstallPath = join(rootPath, ".bun", targetName);
-const toolCacheBunInstallPathFor = (version) => join(process.env.RUNNER_TOOL_CACHE, "bun", version, process.arch);
-const bunPathFor = (bunInstallPath) => join(bunInstallPath, "bin", "bun" + exeExt);
-coreDebug(\`localBunInstallPath=\${localBunInstallPath}\`)
-
-const copyLocalBunInstallToPath = toolCacheBunInstallPathFor(localBunVersion);
-if (!existsSync(copyLocalBunInstallToPath)) {
-  coreDebug(\`copying \${localBunInstallPath} to \${copyLocalBunInstallToPath}\`)
-  await mkdir(dirname(copyLocalBunInstallToPath), { recursive: true });
-  await cp(localBunInstallPath, copyLocalBunInstallToPath, { recursive: true });
-  coreDebug(\`copied \${localBunInstallPath} to \${copyLocalBunInstallToPath}\`)
-}
-const allToolCacheBunVersions = await getAllToolCacheBunVersions();
-const bestToolCacheBunVersion = semverMaxSatisfying(allToolCacheBunVersions, "^" + localBunVersion);
-const bestBunPath = bunPathFor(toolCacheBunInstallPathFor(bestToolCacheBunVersion));
-coreDebug(\`bestToolCacheBunVersion=\${bestToolCacheBunVersion}\`)
-coreDebug(\`bestBunPath=\${bestBunPath}\`)
-
-if (semverLt(bestToolCacheBunVersion, "1.0.0")) {
-  coreWarn("bun0 is deprecated. Please upgrade to bun1.");
-}
-
-const bunChildProcess = spawn(bestBunPath, [filePath], { stdio: "inherit" });
-const [bunExitCode] = await once(bunChildProcess, "exit");
-coreDebug(\`bunExitCode=\${bunExitCode}\`)
-process.exitCode = bunExitCode;
-`;
-const preTemplate = mainTemplate;
-const postTemplate = mainTemplate;
-
-async function getAllBunTags() {
-  const octokit = github.getOctokit(core.getInput("token"));
-  const releases = await octokit.paginate(octokit.rest.repos.listReleases, {
-    owner: "oven-sh",
-    repo: "bun",
-  });
-  return releases.map((x) => x.tag_name);
-}
-
-async function installBun(
-  bunInstallPath: string,
-  tag: string,
-  os: "Windows" | "Linux" | "macOS",
-  arch: "X64" | "X86" | "ARM64" | "ARM",
-  avx2: boolean = true,
-  variant: "debug-info" | "" = ""
-) {
-  core.info(`Installing Bun to ${bunInstallPath}`);
-  if (os === "Windows") {
-    throw new DOMException(
-      "No Bun installation available for Windows",
-      "NotSupportedError"
-    );
-  }
-
-  let target = {
-    "macOS,X64": "darwin-x64",
-    "macOS,ARM64": "darwin-aarch64",
-    "Linux,ARM64": "linux-aarch64",
-    "Linux,X64": "linux-x64",
-  }[[os, arch].toString()];
-  core.debug(`target=${target}`);
-
-  if (target === "darwin-x64" && !avx2) {
-    target = "darwin-x64-baseline";
-  }
-
-  if (target === "linux-x64" && !avx2) {
-    target = "linux-x64-baseline";
-  }
-
-  let exeName = "bun";
-  if (variant === "debug-info") {
-    target = `${target}-profile`;
-    exeName = "bun-profile";
-  }
-  core.debug(`target=${target}`);
-
-  const bunURI = `https://github.com/oven-sh/bun/releases/download/${tag}/bun-${target}.zip`;
-  const bin = join(bunInstallPath, "bin");
-  const exe = join(bin, "bun");
-  core.debug(`bunURI=${bunURI}`);
-  core.debug(`bin=${bin}`);
-  core.debug(`exe=${exe}`);
-
-  core.info(`Downloading Bun from ${bunURI}`);
-  await tc.downloadTool(bunURI, `${exe}.zip`);
-  await tc.extractZip(`${exe}.zip`, bin);
-  core.debug(`moving ${join(bin, `bun-${target}`, exeName)} to ${exe}`);
-  await rename(join(bin, `bun-${target}`, exeName), exe);
-  core.debug(`chmod 0o755 ${exe}`);
-  await chmod(exe, 0o755);
-  core.debug(`rm -r ${join(bin, `bun-${target}`)}`);
-  await rm(join(bin, `bun-${target}`), { recursive: true });
-  core.info(`Installed Bun to ${exe}`);
-}
+import * as bun from "./bun.ts";
 
 const rootPath = resolve(core.getInput("path"));
 const actionPath = ["action.yml", "action.yaml"]
@@ -226,26 +43,19 @@ core.debug(`main=${main}`);
 core.debug(`pre=${pre}`);
 core.debug(`post=${post}`);
 
-const avx2 = core.getBooleanInput("avx2");
-const variant = core.getInput("variant");
-core.debug(`avx2=${avx2}`);
-core.debug(`variant=${variant}`);
-
 let version: string;
 let tag: string;
 if (action.runs.using === "bun0") {
   version = "0.8.1";
   tag = "bun-v0.8.1";
+  core.warning("bun0 is deprecated. Please use bun1 instead.");
 } else {
-  const tags = await getAllBunTags();
-  const versions = tags.map((x) => x.match(/^bun-v(\d+\.\d+\.\d+)$/)?.[1]);
-  const goodVersions = versions.filter((x) => x);
-  core.debug(`tags=${JSON.stringify(tags)}`);
-  core.debug(`versions=${JSON.stringify(versions)}`);
-  core.debug(`goodVersions=${JSON.stringify(goodVersions)}`);
-
-  version = semver.maxSatisfying(goodVersions, "^1.0.0");
-  tag = tags[versions.indexOf(version)];
+  const versionTags = await bun.fetchVersionTagMap();
+  let versions = Object.keys(versionTags);
+  versions.sort(Bun.semver.order);
+  versions = versions.filter((x) => Bun.semver.satisfies(x, "^1.0.0"));
+  version = versions.at(-1)!;
+  tag = versionTags[version];
 }
 core.debug(`version=${version}`);
 core.debug(`tag=${tag}`);
@@ -253,58 +63,69 @@ assert.notEqual(version, null);
 assert.notEqual(tag, null);
 
 core.info(`Using Bun v${version}`);
-const permutations = [
-  { os: "Linux", arch: "X64" },
+const permutations: any[] = [
+  { os: "Linux", arch: "X64", avx2: true },
   { os: "Linux", arch: "ARM64" },
-  { os: "macOS", arch: "X64" },
+  { os: "macOS", arch: "X64", avx2: true },
   { os: "macOS", arch: "ARM64" },
-] as const;
+];
 core.debug(`permutations=${JSON.stringify(permutations)}`);
-for (const { os, arch } of permutations) {
-  const localTargetName = `${os.toLowerCase()}-${arch.toLowerCase()}`;
-  core.debug(`localTargetName=${localTargetName}`);
-  await installBun(
-    join(rootPath, ".bun", localTargetName),
-    tag,
-    os,
-    arch,
-    avx2,
-    variant
-  );
+for (const { os, arch, avx2, variant } of permutations) {
+  const targetName = `${os}-${arch}`;
+  const bunInstall = join(rootPath, ".bun", targetName);
+  await bun.install(bunInstall, tag, os, arch, avx2, variant);
 }
+
+await cp(new URL("./templates/.bun", import.meta.url), join(rootPath, ".bun"), {
+  recursive: true,
+  force: true,
+});
+// TODO: Use standard cookiecutter-esque folder templating library
+const stageTemplate = await readFile(
+  join(rootPath, ".bun", "[stage].mjs"),
+  "utf8"
+);
+const mainJS = stageTemplate.replaceAll(
+  /__(STAGE|FILE_RELATIVE_PATH|LOCAL_BUN_VERSION)__/g,
+  (match) =>
+    ({
+      __STAGE__: "main",
+      __FILE_RELATIVE_PATH__: main,
+      __LOCAL_BUN_VERSION__: version,
+    }[match])
+);
+await writeFile(join(rootPath, ".bun", "main.mjs"), mainJS);
+const preJS = stageTemplate.replaceAll(
+  /__(STAGE|FILE_RELATIVE_PATH|LOCAL_BUN_VERSION)__/g,
+  (match) =>
+    ({
+      __STAGE__: "pre",
+      __FILE_RELATIVE_PATH__: pre,
+      __LOCAL_BUN_VERSION__: version,
+    }[match])
+);
+await writeFile(join(rootPath, ".bun", "pre.mjs"), preJS);
+const postJS = stageTemplate.replaceAll(
+  /__(STAGE|FILE_RELATIVE_PATH|LOCAL_BUN_VERSION)__/g,
+  (match) =>
+    ({
+      __STAGE__: "post",
+      __FILE_RELATIVE_PATH__: post,
+      __LOCAL_BUN_VERSION__: version,
+    }[match])
+);
+await writeFile(join(rootPath, ".bun", "post.mjs"), postJS);
+await rm(join(rootPath, ".bun", "[stage].mjs"));
 
 action.runs.using = "node20";
-
-const mainText = mainTemplate(main, version);
-await writeFile(join(rootPath, "_main.mjs"), mainText);
-action.runs.main = "_main.mjs";
-core.info(`Wrote wrapper to ${join(rootPath, "_main.mjs")}`);
-
-if (pre != null) {
-  const preText = preTemplate(pre, version);
-  await writeFile(join(rootPath, "_pre.mjs"), preText);
-  action.runs.pre = "_pre.mjs";
-  core.info(`Wrote wrapper to ${join(rootPath, "_pre.mjs")}`);
-}
-
-if (post != null) {
-  const postText = postTemplate(post, version);
-  await writeFile(join(rootPath, "_post.mjs"), postText);
-  action.runs.post = "_post.mjs";
-  core.info(`Wrote wrapper to ${join(rootPath, "_post.mjs")}`);
-}
+action.runs.main = ".bun/main.mjs";
+action.runs.pre &&= ".bun/pre.mjs";
+action.runs.post &&= ".bun/post.mjs";
 
 core.debug(`action=${JSON.stringify(action)}`);
 await writeFile(actionPath, YAML.stringify(action));
 core.info(`Wrote action to ${actionPath}`);
 
-const addFiles = [
-  actionPath,
-  join(rootPath, ".bun"),
-  join(rootPath, "_main.mjs"),
-  join(rootPath, "_pre.mjs"),
-  join(rootPath, "_post.mjs"),
-];
-core.debug(`addFiles=${JSON.stringify(addFiles)}`);
-await $({ stdio: "inherit", reject: false })`git add -f ${addFiles}`;
+await $`git add -f ${actionPath}`;
+await $`git add -f ${join(rootPath, ".bun")}`;
 core.info(`Added files to Git`);
