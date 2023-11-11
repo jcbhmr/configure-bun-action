@@ -60,7 +60,7 @@ async function install(
     const verionTags = await fetchVersionTagMap();
     const versions = Object.keys(verionTags);
     versions.sort(Bun.semver.order);
-    assert(versions.length > 0);
+    assert.notEqual(versions.length, 0);
     const latestVersion = versions.at(-1)!;
     tag = verionTags[latestVersion];
   }
@@ -87,8 +87,6 @@ async function install(
   core.debug(`arch=${arch}`);
   core.debug(`avx2=${avx2}`);
   core.debug(`variant=${variant}`);
-
-  core.info(`Installing Bun ${tag} to ${bunInstallPath} for ${os} ${arch}`);
 
   if (os === "Windows") {
     throw new DOMException(
