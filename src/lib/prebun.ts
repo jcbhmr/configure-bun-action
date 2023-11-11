@@ -24,7 +24,7 @@ async function fetchVersionTagMap() {
 
   const map = Object.create(null);
   for (const release of releases) {
-    const version = release.tag_name.match(/^v?(\d+\.\d+\.\d+)$/)?.[1];
+    const version = release.tag_name.match(/^(?:bun-)?v?(\d+\.\d+\.\d+)$/)?.[1];
     if (!version) {
       continue;
     }
@@ -54,12 +54,12 @@ async function install(
   os: "Windows" | "Linux" | "macOS",
   arch: "X64" | "X86" | "ARM64" | "ARM",
   avx2: boolean | undefined = undefined,
-  variant: "debug-info" | null = null
+  variant: "debug-info" | null = null,
 ) {
   if (os === "Windows") {
     throw new DOMException(
       "No Bun installation available for Windows",
-      "NotSupportedError"
+      "NotSupportedError",
     );
   }
 
@@ -70,13 +70,13 @@ async function install(
     "Linux,X64": "linux-x64",
   }[[os, arch].toString()];
   if (target === "darwin-x64") {
-    assert.notEqual(avx2, undefined)
+    assert.notEqual(avx2, undefined);
     if (!avx2) {
       target = "darwin-x64-baseline";
     }
   }
   if (target === "linux-x64") {
-    assert.notEqual(avx2, undefined)
+    assert.notEqual(avx2, undefined);
     if (!avx2) {
       target = "linux-x64-baseline";
     }

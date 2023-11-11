@@ -73,8 +73,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
       - uses: jcbhmr/configure-bun-action@v1
-      - run:
-          bun build --entrypoints ./index.ts --outdir ./out --target bun
+      - run: bun build --entrypoints ./index.ts --outdir ./out --target bun
           --splitting
       - uses: # SOMETHING
       - uses: actions/publish-action@v0.2.2
@@ -99,4 +98,4 @@ When this configurator action runs, it essentially does the following:
    ARM64. There are currently no Bun builds for Windows, so we don't support
    Windows x64 at this time.
 
-2. **Instantiate the wrapper 
+2. \*\*Instantiate the wrapper

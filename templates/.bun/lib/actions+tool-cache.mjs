@@ -25,7 +25,7 @@ export async function cacheDir(sourceDir, tool, version) {
     process.env.RUNNER_TOOL_CACHE,
     tool,
     version,
-    process.arch
+    process.arch,
   );
   await rm(folderPath, { force: true, recursive: true });
   await rm(`${folderPath}.complete`, { force: true });
@@ -51,7 +51,7 @@ export function find(toolName, versionSpec) {
     process.env.RUNNER_TOOL_CACHE,
     toolName,
     version,
-    process.arch
+    process.arch,
   );
   if (existsSync(toolPath) && existsSync(`${toolPath}.complete`)) {
     return toolPath;

@@ -10,7 +10,7 @@ export async function main(stagePath, localBunVersion, stage) {
   const targetName = `${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`;
   const exeExt = process.platform === "win32" ? ".exe" : "";
   const localBunInstallPath = fileURLToPath(
-    import.meta.resolve(`./${targetName}/`)
+    import.meta.resolve(`./${targetName}/`),
   );
   const bunPathFor = (bunInstallPath) =>
     join(bunInstallPath, "bin", "bun" + exeExt);

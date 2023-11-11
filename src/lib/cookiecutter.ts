@@ -11,7 +11,10 @@ export default async function cookiecutter(src, dest, vars) {
     }
   } else {
     let text = await readFile(src, "utf8");
-    text = text.replace(/__(\w+)__/g, (m, x) => vars[x] || m);
+    text = text.replace(
+      new RegExp(Object.keys(vars).join("|"), "g"),
+      (m) => vars[m],
+    );
     await writeFile(join(dirname(dest), basename(src)), text);
   }
 }
