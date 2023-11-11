@@ -1,5 +1,5 @@
 import { stat, readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname, basename } from "node:path";
 
 export default async function cookiecutter(src, dest, vars) {
   if ((await stat(src)).isDirectory()) {
