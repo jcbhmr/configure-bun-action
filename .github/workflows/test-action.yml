@@ -2,7 +2,22 @@ name: Test action
 on:
   push:
     branches: "main"
+    paths-ignore:
+      - README.md
+      - LICENSE
+      - .gitignore
+      - .github/**
+      - "!.github/workflows/test-action.yml"
   pull_request:
+    paths-ignore:
+      - README.md
+      - LICENSE
+      - .gitignore
+      - .github/**
+      - "!.github/workflows/test-action.yml"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   bun0:
     strategy:
