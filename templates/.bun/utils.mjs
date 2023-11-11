@@ -4,8 +4,9 @@ import * as tc from "./lib/actions+tool-cache.mjs";
 import * as Bun from "./lib/bun.mjs";
 import { $ } from "./lib/execa.mjs";
 import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
-export async function main(stagePath, localBunVersion, stage) {
+export async function main(fileRelativePath, localBunVersion, stage) {
   const rootPath = fileURLToPath(import.meta.resolve("../"));
   const targetName = `${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`;
   const exeExt = process.platform === "win32" ? ".exe" : "";
