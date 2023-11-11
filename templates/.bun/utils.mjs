@@ -10,7 +10,7 @@ export async function main(fileRelativePath, localBunVersion, stage) {
   const rootPath = fileURLToPath(import.meta.resolve("../"));
   const targetName = `${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`;
   const exeExt = process.platform === "win32" ? ".exe" : "";
-  
+
   const localBunInstallPath = fileURLToPath(
     import.meta.resolve(`./${targetName}/`),
   );
@@ -19,6 +19,6 @@ export async function main(fileRelativePath, localBunVersion, stage) {
 
   const bun = join(found, "bin", "bun" + exeExt);
   const filePath = join(rootPath, fileRelativePath);
-  const { exitCode } = await $({ stdio: "inherit " })`${bun} ${filePath}`;
+  const { exitCode } = await $({ stdio: "inherit" })`${bun} ${filePath}`;
   process.exitCode = exitCode;
 }
