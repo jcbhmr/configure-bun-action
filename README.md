@@ -129,15 +129,13 @@ jobs:
 When using the recommended `on: release` post-release build workflow, there's
 also these caveats:
 
-- The <kbd>Generate release notes</kbd> button on the GitHub release web UI
-  doesn't accurately generate a diff link.
-
 - There's a ~30 second window where the latest release has uncompiled code.
   **The major tags are _never_ affected**. This is **nothing to worry about**
   because _there's no way this could break anything_. The only way to see the
   uncompiled code would be to explicitly `uses: octocat/my-action@v1.2.3` (`@v1`
   is unaffected) **immediately** after v1.2.3 was released. It's not humanly
-  possible to respond that fast to a new release.
+  possible to respond that fast to a new release. Even so, this is still a thing
+  that is worth knowing.
 
 ## How it works
 
