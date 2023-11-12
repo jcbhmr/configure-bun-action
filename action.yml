@@ -1,6 +1,10 @@
 name: Configure Bun action
 description: 🧅 Write your GitHub Actions in Bun!
 
+branding:
+  icon: settings
+  color: yellow
+
 inputs:
   token:
     default: ${{ github.token }}
