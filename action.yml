@@ -1,5 +1,5 @@
 name: Configure Bun action
-description: 🧅 Write your GitHub Actions in Bun!
+description: 🧅 Write your GitHub Actions using Bun!
 
 branding:
   icon: settings
