@@ -19,7 +19,10 @@ export async function main(fileRelativePath, localBunVersion, stage) {
 
   const bun = join(found, "bin", "bun" + exeExt);
   const filePath = join(rootPath, fileRelativePath);
-  const { exitCode } = await $({ stdio: "inherit", reject: false })`${bun} ${filePath}`;
-  console.debug(exitCode)
-  process.exitCode = exitCode;
+  const { exitCode, signal } = await $({ stdio: "inherit", reject: false })`${bun} ${filePath}`;
+  if (signal) {
+    process.kill(process.pid, signal);
+  } else {
+    process.exit(exitCode)
+  }
 }
