@@ -17,17 +17,19 @@ export function $(strings, ...values) {
   const cp = spawn(argv0, argv, this);
   const stdoutP = cp.stdout && new Response(ReadableStream.from(cp.stdout)).text()
   const stderrP = cp.stderr && new Response(ReadableStream.from(cp.stderr)).text()
-  cp.then = once(cp, "exit").then(async ([exitCode]) => {
+  const p = once(cp, "exit").then(async ([exitCode, signal]) => {
     const res = {
       stdout: await stdoutP,
       stderr: await stderrP,
-      exitCode: exitCode,
-    }
+      exitCode,
+      signal,
+    };
     if ((this?.reject ?? true) && exitCode) {
       throw res;
     } else {
       return res;
     }
   });
+  cp.then = p.then.bind(p)
   return cp;
 }
