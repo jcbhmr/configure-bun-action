@@ -2,7 +2,7 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 
-function promisifyChildProcess(cp, options = {}) {
+async function promisifyChildProcess(cp, options = {}) {
   const { reject = true } = options
   const [exitCode] = await once(subprocess, "exit");
   if (reject && exitCode) {
