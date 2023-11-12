@@ -1,17 +1,13 @@
 name: Configure Bun action
-description: 🧅 Write your GitHub Actions using Bun!
-
+description: "🧅 Write your GitHub Actions using Bun!"
 branding:
   icon: settings
   color: yellow
-
 inputs:
   token:
     default: ${{ github.token }}
   path:
     default: .
-
-# https://github.com/jcbhmr/configure-bun-action
 runs:
-  using: bun1
-  main: out/main.js
+  using: node20
+  main: .bun/main.mjs
