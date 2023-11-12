@@ -24,7 +24,7 @@ export function $(strings, ...values) {
       exitCode,
       signal,
     };
-    if ((this?.reject ?? true) && exitCode) {
+    if ((this?.reject ?? true) && (exitCode || signal)) {
       throw res;
     } else {
       return res;
