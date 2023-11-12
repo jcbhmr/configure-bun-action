@@ -2,6 +2,16 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 
+function promisifyChildProcess(cp, options = {}) {
+  const { reject = true } = options
+  const [exitCode] = await once(subprocess, "exit");
+  if (reject && exitCode) {
+    throw subprocess;
+  } else {
+    return subprocess;
+  }
+}
+
 export function $(strings, ...values) {
   if (!Array.isArray(strings)) {
     return $.bind(Object.assign(this ?? {}, strings));
@@ -14,10 +24,10 @@ export function $(strings, ...values) {
   let argv = cmdWithKeys.split(/\s+/);
   argv = argv.map((arg) => arg.replace(keyRe, (m, i) => values[i]));
   const argv0 = argv.shift();
-  const subprocess = spawn(argv0, argv, this);
-  const p = once(subprocess, "exit");
-  subprocess.then = p.then.bind(p);
-  subprocess.catch = p.catch.bind(p);
-  subprocess.finally = p.finally.bind(p);
-  return subprocess;
+  const cp = spawn(argv0, argv, this);
+  const p = promisifyChildProcess(cp, this ?? {});
+  cp.then = p.then.bind(p);
+  cp.catch = p.catch.bind(p);
+  cp.finally = p.finally.bind(p);
+  return cp;
 }
