@@ -15,8 +15,8 @@ export function $(strings, ...values) {
   argv = argv.map((arg) => arg.replace(keyRe, (m, i) => values[i]));
   const argv0 = argv.shift();
   const cp = spawn(argv0, argv, this);
-  const stdoutP = new Response(ReadableStream.from(cp.stdout)).text()
-  const stderrP = new Response(ReadableStream.from(cp.stderr)).text()
+  const stdoutP = cp.stdout && new Response(ReadableStream.from(cp.stdout)).text()
+  const stderrP = cp.stderr && new Response(ReadableStream.from(cp.stderr)).text()
   cp.then = once(cp, "exit").then(async ([exitCode]) => {
     const res = {
       stdout: await stdoutP,
