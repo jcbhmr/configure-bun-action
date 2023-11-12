@@ -4,11 +4,11 @@ import { once } from "node:events";
 
 async function promisifyChildProcess(cp, options = {}) {
   const { reject = true } = options
-  const [exitCode] = await once(subprocess, "exit");
+  const [exitCode] = await once(cp, "exit");
   if (reject && exitCode) {
-    throw subprocess;
+    throw cp;
   } else {
-    return subprocess;
+    return cp;
   }
 }
 
