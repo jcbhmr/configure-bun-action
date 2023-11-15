@@ -71,7 +71,11 @@ export async function bunMetaList() {
     }
     map[version] = release.tag_name;
   }
-  assert.notEqual(Object.keys(map).length, 0);
+  assert.notEqual(
+    Object.keys(map).length,
+    0,
+    `no versions found ${JSON.stringify(releases)}`
+  );
   return map;
 }
 
@@ -80,9 +84,7 @@ export async function readAction(rootOrPath: string) {
     cwd: rootOrPath,
     type: "file",
   });
-  if (!actionPath) {
-    throw new DOMException("action.ya?ml not found", "NotFoundError");
-  }
+  assert(actionPath, `no action.yml found in ${rootOrPath}`);
 
   const actionDoc = YAML.parseDocument(await readFile(actionPath, "utf8"));
   return actionDoc;

@@ -5,6 +5,7 @@ import { createReadStream, createWriteStream, existsSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
 import { findUp } from "find-up";
 import * as YAML from "yaml";
+import assert from "node:assert/strict";
 
 export async function gunzip(path: string) {
   if (existsSync(`${path}.gz`)) {
@@ -24,9 +25,7 @@ export async function main(stage: "main" | "pre" | "post") {
     cwd: new URL(import.meta.url),
     type: "file",
   });
-  if (!actionPath) {
-    throw new DOMException("action.ya?ml not found", "NotFoundError");
-  }
+  assert(actionPath, `no action.yml found from ${import.meta.url}`);
   const rootPath = dirname(actionPath);
   const action = YAML.parse(await readFile(actionPath, "utf8"));
 
