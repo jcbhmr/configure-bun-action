@@ -9,10 +9,10 @@ import {
 import * as semver from "semver";
 import assert from "node:assert/strict";
 import * as YAML from "yaml";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { cp } from "node:fs/promises";
 
-const rootPath = core.getInput("path");
+const rootPath = resolve(core.getInput("path"));
 
 const params = {
   __proto__: null,

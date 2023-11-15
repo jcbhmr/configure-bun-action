@@ -1,4 +1,12 @@
-import { chmod, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import {
+  chmod,
+  readFile,
+  rename,
+  rm,
+  stat,
+  writeFile,
+  mkdir,
+} from "node:fs/promises";
 import { join } from "node:path";
 import * as tc from "@actions/tool-cache";
 import assert from "node:assert/strict";
@@ -40,12 +48,12 @@ export async function bunMetaInstall(
   const bin = join(dest, "bin");
   const exe = join(bin, "bun");
 
-  await tc.downloadTool(bunURI, `${exe}.zip`);
-  await tc.extractZip(`${exe}.zip`, bin);
+  await mkdir(bin, { recursive: true });
+  const temp = await tc.downloadTool(bunURI);
+  await tc.extractZip(temp, bin);
   await rename(join(bin, `bun-${target}`, exeName), exe);
   await chmod(exe, 0o755);
   await rm(join(bin, `bun-${target}`), { recursive: true });
-  await rm(`${exe}.zip`);
 }
 
 export const octokit = core.getInput("token")
