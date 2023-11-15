@@ -11,7 +11,6 @@ inputs:
   path:
     default: .
 
-# TODO: Dog-food own action once hits v1 stable
 runs:
   using: node20
-  main: out/main.js
+  main: dist/main.js
