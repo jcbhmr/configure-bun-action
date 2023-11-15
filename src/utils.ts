@@ -27,9 +27,9 @@ export async function bunMetaInstall(
 ) {
   let target = {
     "Linux,X64": "linux-x64",
-    "Linux,ARM64": "linux-arm64",
+    "Linux,ARM64": "linux-aarch64",
     "macOS,X64": "darwin-x64",
-    "macOS,ARM64": "darwin-arm64",
+    "macOS,ARM64": "darwin-aarch64",
   }[[runnerOs, runnerArch].toString()];
   if (!target) {
     throw new DOMException(
