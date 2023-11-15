@@ -79,7 +79,7 @@ mutate_it: {
   // preserve the original action.yml runs into the .bun key
   // and add some meta
   const dotBunData = runs.toJSON();
-  dotBunData.version = version;
+  // dotBunData.version = version;
   actionDoc.set(".bun", dotBunData);
 
   const runsMain = runs.get("main");

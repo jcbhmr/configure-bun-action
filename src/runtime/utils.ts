@@ -6,6 +6,7 @@ import { readFile, rm } from "node:fs/promises";
 import { findUp } from "find-up";
 import * as YAML from "yaml";
 import assert from "node:assert/strict";
+import { createGunzip } from "node:zlib";
 
 export async function gunzip(path: string) {
   if (existsSync(`${path}.gz`)) {
@@ -13,8 +14,7 @@ export async function gunzip(path: string) {
   }
   await pipeline(
     createReadStream(path),
-    // @ts-ignore
-    new DecompressionStream("gzip"),
+    createGunzip(),
     createWriteStream(path.replace(/\.gz$/, ""))
   );
   await rm(path);

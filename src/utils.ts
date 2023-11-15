@@ -17,6 +17,7 @@ import { createReadStream, createWriteStream, existsSync } from "node:fs";
 import { findUp } from "find-up";
 import * as YAML from "yaml";
 import { pipeline } from "node:stream/promises";
+import { createGzip } from "node:zlib";
 
 export async function bunMetaInstall(
   dest: string,
@@ -116,8 +117,7 @@ export async function writeAction(
 export async function gzip(path: string) {
   await pipeline(
     createReadStream(path),
-    // @ts-ignore
-    new CompressionStream("gzip"),
+    createGzip(),
     createWriteStream(`${path}.gz`)
   );
   await rm(path);
