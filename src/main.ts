@@ -102,12 +102,12 @@ mutate_it: {
     break mutate_it;
   }
   runs.set("using", "node20");
-  runs.set("main", ".bun/main.mjs");
+  runs.set("main", ".bun/main.js");
   if (runsPre != null) {
-    runs.set("pre", ".bun/pre.mjs");
+    runs.set("pre", ".bun/pre.js");
   }
   if (runsPost != null) {
-    runs.set("post", ".bun/post.mjs");
+    runs.set("post", ".bun/post.js");
   }
 
   await writeAction(rootPath, actionDoc);
