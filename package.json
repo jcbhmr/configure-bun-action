@@ -17,8 +17,5 @@
   },
   "scripts": {
     "build": "node build.js"
-  },
-  "workspaces": [
-    "packages/*"
-  ]
+  }
 }
