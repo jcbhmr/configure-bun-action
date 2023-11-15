@@ -40,12 +40,6 @@ jobs:
           path: test/bun0
       - shell: jq -C . {0}
         run: ${{ toJSON(steps.main.outputs) }}
-      - run: ls -A test/bun0
-      - run: ls -A test/bun0/.bun
-      - run: cat test/bun0/action.yml
-      - run: cat test/bun0/.bun/main.mjs
-      - run: cat test/bun0/.bun/pre.mjs
-      - run: cat test/bun0/.bun/post.mjs
       - uses: ./test/bun0
   bun1:
     strategy:
@@ -68,10 +62,4 @@ jobs:
           path: test/bun1
       - shell: jq -C . {0}
         run: ${{ toJSON(steps.main.outputs) }}
-      - run: ls -A test/bun1
-      - run: ls -A test/bun1/.bun
-      - run: cat test/bun1/action.yml
-      - run: cat test/bun1/.bun/main.mjs
-      - run: cat test/bun1/.bun/pre.mjs
-      - run: cat test/bun1/.bun/post.mjs
       - uses: ./test/bun1

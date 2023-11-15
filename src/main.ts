@@ -1,25 +1,18 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { join, dirname, resolve } from "node:path";
 import * as core from "@actions/core";
-import * as tc from "@actions/tool-cache";
-import * as YAML from "yaml";
+import {
+  bunMetaInstall,
+  bunMetaList,
+  gzip,
+  readAction,
+  writeAction,
+} from "./utils.ts";
+import * as semver from "semver";
 import assert from "node:assert/strict";
-import * as github from "@actions/github";
-import * as prebun from "./prebun.ts";
-import cookiecutter from "./cookiecutter.ts";
-import { fileURLToPath } from "node:url";
-import.meta.resolve = (s) => new URL(s, import.meta.url).href;
+import * as YAML from "yaml";
+import { join } from "node:path";
+import { cp } from "node:fs/promises";
 
-const rootPath = resolve(core.getInput("path"));
-
-const actionPath = ["action.yml", "action.yaml"]
-  .map((x) => join(rootPath, x))
-  .find((x) => existsSync(x))!;
-const action = YAML.parse(await readFile(actionPath, "utf8"));
-assert.equal(typeof action, "object");
-assert.equal(typeof action.runs, "object");
-assert.equal(typeof action.runs.using, "string");
+const rootPath = core.getInput("path");
 
 const params = {
   __proto__: null,
@@ -29,57 +22,93 @@ const params = {
     return { version, tag };
   },
   async bun1() {
-    const versionTags = await prebun.fetchVersionTagMap();
+    const versionTags = await bunMetaList();
     let versions = Object.keys(versionTags);
-    versions.sort(Bun.semver.order);
-    versions = versions.filter((x) => Bun.semver.satisfies(x, "^1.0.0"));
-    assert.notEqual(versions.length, 0);
-    const version = versions.at(-1)!;
+    const version = semver.maxSatisfying(versions, "^1.0.0");
+    assert(version, "no version found");
     const tag = versionTags[version];
     return { version, tag };
   },
 };
-assert(action.runs.using in params);
 
-assert.equal(typeof action.runs.main, "string");
-if ("pre" in action.runs) {
-  assert.equal(typeof action.runs.pre, "string");
-}
-if ("post" in action.runs) {
-  assert.equal(typeof action.runs.post, "string");
-}
-const { main, pre, post } = action.runs;
+mutate_it: {
+  const actionDoc = await readAction(rootPath);
 
-const { version, tag } = await params[action.runs.using]();
+  const runs = actionDoc.get("runs") as YAML.Document.Parsed;
+  if (!runs) {
+    core.warning("no 'runs' in action");
+    break mutate_it;
+  }
+  if (typeof runs !== "object") {
+    core.warning("'runs' is not an object");
+    break mutate_it;
+  }
+  const runsUsing = runs.get("using");
+  if (!runsUsing) {
+    core.warning("no 'runs.using' in action");
+    break mutate_it;
+  }
+  if (typeof runsUsing !== "string") {
+    core.warning("'runs.using' is not a string");
+    break mutate_it;
+  }
+  if (!(runsUsing in params)) {
+    core.warning(`'runs.using' is not in ${Object.keys(params)}`);
+    break mutate_it;
+  }
+  const { version, tag } = await params[runsUsing as "bun0" | "bun1"]();
 
-await cookiecutter(
-  fileURLToPath(import.meta.resolve("../templates/.bun/")),
-  join(rootPath, ".bun"),
-  {
-    __MAIN__: JSON.stringify(main),
-    __PRE__: JSON.stringify(pre),
-    __POST__: JSON.stringify(post),
-    __LOCAL_BUN_VERSION__: JSON.stringify(version),
-  },
-);
-const permutations: any[] = [
-  { os: "Linux", arch: "X64", avx2: true },
-  { os: "Linux", arch: "ARM64" },
-  { os: "macOS", arch: "X64", avx2: true },
-  { os: "macOS", arch: "ARM64" },
-];
-for (const { os, arch, avx2, variant } of permutations) {
-  const bunInstall = join(rootPath, ".bun", `${os}-${arch}`);
-  await prebun.install(bunInstall, tag, os, arch, avx2, variant);
-}
+  await cp(new URL(import.meta.resolve("./runtime/")), join(rootPath, ".bun"), {
+    recursive: true,
+  });
 
-action.runs.using = "node20";
-action.runs.main = ".bun/main.mjs";
-if (pre != null) {
-  action.runs.pre = ".bun/pre.mjs";
-}
-if (post != null) {
-  action.runs.post = ".bun/post.mjs";
-}
+  // avx2 assumed to be true
+  const installMatrix = [
+    { os: "Linux", arch: "X64" },
+    { os: "Linux", arch: "ARM64" },
+    { os: "macOS", arch: "X64" },
+    { os: "macOS", arch: "ARM64" },
+  ] as const;
+  for (const { os, arch } of installMatrix) {
+    const targetName = `${os}-${arch}`;
+    const installPath = join(rootPath, ".bun", targetName);
+    await bunMetaInstall(installPath, tag, os, arch);
+    await gzip(join(installPath, "bin", "bun"));
+  }
 
-await writeFile(actionPath, YAML.stringify(action));
+  // preserve the original action.yml runs into the .bun key
+  // and add some meta
+  const dotBunData = runs.toJSON();
+  dotBunData.version = version;
+  runs.set(".bun", dotBunData);
+
+  const runsMain = runs.get("main");
+  if (!runsMain) {
+    core.warning("no 'runs.main' in action");
+    break mutate_it;
+  }
+  if (typeof runsMain !== "string") {
+    core.warning("'runs.main' is not a string");
+    break mutate_it;
+  }
+  const runsPre = runs.get("pre");
+  if (runsPre != null && typeof runsPre !== "string") {
+    core.warning("'runs.pre' is not a string");
+    break mutate_it;
+  }
+  const runsPost = runs.get("post");
+  if (runsPost != null && typeof runsPost !== "string") {
+    core.warning("'runs.post' is not a string");
+    break mutate_it;
+  }
+  runs.set("using", "node20");
+  runs.set("main", ".bun/main.mjs");
+  if (runsPre != null) {
+    runs.set("pre", ".bun/pre.mjs");
+  }
+  if (runsPost != null) {
+    runs.set("post", ".bun/post.mjs");
+  }
+
+  await writeAction(rootPath, actionDoc);
+}

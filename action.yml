@@ -11,7 +11,7 @@ inputs:
   path:
     default: .
 
-# https://github.com/jcbhmr/configure-bun-action
+# TODO: Dog-food own action once hits v1 stable
 runs:
-  using: bun1
+  using: node20
   main: out/main.js

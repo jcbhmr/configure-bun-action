@@ -40,13 +40,12 @@ runs:
 ![Bun](https://img.shields.io/static/v1?style=for-the-badge&message=Bun&color=000000&logo=Bun&logoColor=FFFFFF&label=)
 ![GitHub Actions](https://img.shields.io/static/v1?style=for-the-badge&message=GitHub+Actions&color=2088FF&logo=GitHub+Actions&logoColor=FFFFFF&label=)
 
-**🚀 Looking to get started fast? Check out the ["Hello world!" GitHub Action
-using Bun] template to hit the ground running!**
+**🚀 Looking to get started with a template? Check out the ["Hello world!"
+GitHub Action using Bun] template to hit the ground running!**
 
 To get started using Bun as your GitHub Actions runtime of choice, just add this
 to your `action.yml`. Yes, it's non-standard and won't work as-is but don't
-worry, we'll preprocess it with `uses: jcbhmr/configure-bun-action@v1` to
-downlevel it to use the native Node.js runtime.
+worry, we'll preprocess it with `uses: jcbhmr/configure-bun-action@v1`.
 
 ```yml
 # action.yml
@@ -157,7 +156,7 @@ by GitHub Actions consumers. That means doing `git add .bun`, `git commit`, and
 
 ## Development
 
-![Bun](https://img.shields.io/static/v1?style=for-the-badge&message=Bun&color=000000&logo=Bun&logoColor=FFFFFF&label=)
+![Node.js](https://img.shields.io/static/v1?style=for-the-badge&message=Node.js&color=339933&logo=Node.js&logoColor=FFFFFF&label=)
 
 **Why Node.js instead of Docker as the native runtime?**
 
