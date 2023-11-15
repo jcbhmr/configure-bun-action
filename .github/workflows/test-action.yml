@@ -30,10 +30,12 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: bun install
-      - run: bun run build
-      - uses: jcbhmr/configure-bun-action@v0.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm install
+      - run: npm run build
       - id: main
         uses: ./
         with:
@@ -52,10 +54,12 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: bun install
-      - run: bun run build
-      - uses: jcbhmr/configure-bun-action@v0.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm install
+      - run: npm run build
       - id: main
         uses: ./
         with:
