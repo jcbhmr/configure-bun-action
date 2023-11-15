@@ -80,7 +80,7 @@ mutate_it: {
   // and add some meta
   const dotBunData = runs.toJSON();
   dotBunData.version = version;
-  runs.set(".bun", dotBunData);
+  actionDoc.set(".bun", dotBunData);
 
   const runsMain = runs.get("main");
   if (!runsMain) {
@@ -111,4 +111,5 @@ mutate_it: {
   }
 
   await writeAction(rootPath, actionDoc);
+  console.log(actionDoc.toString())
 }
