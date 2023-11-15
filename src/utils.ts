@@ -45,6 +45,7 @@ export async function bunMetaInstall(
   }
 
   const bunURI = `https://github.com/oven-sh/bun/releases/download/${tag}/bun-${target}.zip`;
+  core.info(`downloading ${bunURI}`);
   const bin = join(dest, "bin");
   const exe = join(bin, "bun");
 
