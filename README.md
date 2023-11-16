@@ -114,13 +114,14 @@ jobs:
 
 ### Caveats
 
-- There's a ~50 ms startup delay from the Node.js wrapper. This is required
-  since we are using Node.js as our native runtime layer.
+- There's a startup delay from the Node.js wrapper. This is required since we
+  are using Node.js as our native runtime layer. There's an additional startup
+  delay from un-gzipping the binary files.
 
 - This GitHub Action pseudo-runtime relies on large binary files in your Git
   repository. As you create more releases you repository size may grow quite
   large. We aren't using a from-network installation because the startup time
-  would skyrocket to from ~50 ms to ~5 seconds.
+  would skyrocket to ~5 seconds.
 
 - Any GitHub Action created using Bun won't support Windows since **Bun doesn't
   yet provide stable builds for Windows**. [oven-sh/bun#43]
