@@ -28,6 +28,7 @@ export async function main(stage: "main" | "pre" | "post") {
   assert(actionPath, `no action.yml found from ${import.meta.url}`);
   const rootPath = dirname(actionPath);
   const action = YAML.parse(await readFile(actionPath, "utf8"));
+  const dotBunData = action[".bun"]
 
   const targetName = `${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`;
 
@@ -37,8 +38,7 @@ export async function main(stage: "main" | "pre" | "post") {
   if (existsSync(`${bun}.gz`)) {
     await gunzip(bun);
   }
-  const filePath = join(rootPath, action.runs[stage]!);
-  console.log(filePath, bun)
+  const filePath = join(rootPath, dotBunData[stage]!);
   const { exitCode, signal } = await $({
     stdio: "inherit",
     reject: false,
