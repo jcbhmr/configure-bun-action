@@ -38,6 +38,9 @@ export async function main(stage: "main" | "pre" | "post") {
   }
   const filePath = join(rootPath, dotBunData[stage]!);
   const { failed, escapedCommand, exitCode, signal } = await $({
+  if (dotBunData.version.startsWith("0.")) {
+    console.warn("The 'bun0' version is deprecated and will be removed. Please use 'bun1' instead. For more information, visit https://github.com/jcbhmr/configure-bun-action and https://bun.sh/blog/bun-v1.0");
+  }
     stdio: "inherit",
     reject: false,
   })`${bun} ${filePath}`;
