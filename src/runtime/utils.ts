@@ -39,11 +39,12 @@ export async function main(stage: "main" | "pre" | "post") {
     await gunzip(bun);
   }
   const filePath = join(rootPath, dotBunData[stage]!);
-  console.log`${bun} ${filePath}`
+  console.log(bun, filePath)
   const { exitCode, signal } = await $({
     stdio: "inherit",
     reject: false,
   })`${bun} ${filePath}`;
+  console.log(exitCode, signal)
   if (signal) {
     process.kill(process.pid, signal);
   } else {
