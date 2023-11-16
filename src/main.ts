@@ -74,7 +74,7 @@ mutate_it: {
     const targetName = `${os}-${arch}`;
     const installPath = join(rootPath, ".bun", targetName);
     await bunMetaInstall(installPath, tag, os, arch);
-    await gzip(join(installPath, "bin", "bun" + process.platform === "win32" ? ".exe" : ""));
+    await gzip(join(installPath, "bin", "bun"));
   }
 
   // preserve the original action.yml runs into the .bun key

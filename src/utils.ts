@@ -50,12 +50,13 @@ export async function bunMetaInstall(
   const bin = join(dest, "bin");
   const exe = join(bin, "bun");
 
-  await mkdir(bin, { recursive: true });
-  const temp = await tc.downloadTool(bunURI);
-  await tc.extractZip(temp, bin);
+  await mkdir(dest, { recursive: true });
+  await tc.downloadTool(bunURI, `${exe}.zip`);
+  await tc.extractZip(`${exe}.zip`, bin);
   await rename(join(bin, `bun-${target}`, exeName), exe);
   await chmod(exe, 0o755);
   await rm(join(bin, `bun-${target}`), { recursive: true });
+  await rm(`${exe}.zip`)
 }
 
 export const octokit = core.getInput("token")
