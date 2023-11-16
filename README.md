@@ -142,17 +142,7 @@ also these caveats:
 
 ## How it works
 
-When this configurator action runs, it essentially does the following:
-
-1. **Clone the code from `templates/.bun` into the `./bun` folder** which
-   provides the wrapper `main.mjs` Node.js script which then runs
-   `bun /path/to/main.ts`. This includes `pre.mjs` and `post.mjs` too if you're
-   using `pre` and/or `post` hooks.
-
-2. **Download as many copies of Bun as needed** to support as many platforms are
-   required. By default we do Linux x64, Linux ARM64, macOS x64, and macOS
-   ARM64. There are currently no Bun builds for Windows, so **we don't support
-   Windows x64** at this time.
+When this configurator action runs, it essentially does the following... TODO
 
 This action **relies on _you_ to commit the result** in order to make it usable
 by GitHub Actions consumers. That means doing `git add .bun`, `git commit`, and
