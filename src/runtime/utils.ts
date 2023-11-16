@@ -37,12 +37,10 @@ export async function main(stage: "main" | "pre" | "post") {
     await gunzip(bun);
   }
   const filePath = join(rootPath, dotBunData[stage]!);
-  console.log(bun, filePath)
   const { failed, escapedCommand, exitCode, signal } = await $({
     stdio: "inherit",
     reject: false,
   })`${bun} ${filePath}`;
-  console.log(exitCode, signal)
   if (failed) {
     console.error(escapedCommand, "failed")
     process.exit(100)
