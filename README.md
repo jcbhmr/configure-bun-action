@@ -74,17 +74,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jcbhmr/configure-bun-action@v1
-      - uses: actions4git/add-commit-push@v1
+      - uses: actions4git/setup-git@v1
+      - run: git add -Af && git commit -m 'Automatic changes'
+      - run: git tag -f "$TAG" && git push -f origin "$TAG"
+        env:
+          TAG: ${{ github.event.release.tag_name }}
       - uses: actions/publish-action@v0.2.2
         with:
           source-tag: ${{ github.event.release.tag_name }}
 ```
 
 Look at that! Now whenever we release a new `v1.0.0` version this workflow will
-run to downlevel our `using: bun1` action to `using: node20`. Then
-[actions4git/add-commit-push] will update the tag to use the compiled version.
-After that magic has completed, [actions/publish-action] will update the major
-`v1` version tag to point to the new release.
+run to downlevel our `using: bun1` action to `using: node20`. Then we update the
+tag to use the compiled version. After that magic has completed,
+[actions/publish-action] will update the major `v1` version tag to point to the
+new release.
 
 [💡 You can use this post-release tag mutation trick for your Node.js-based GitHub Actions too!](https://github.com/jcbhmr/hello-world-nodejs-action)
 
