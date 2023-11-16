@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { build } from "vite";
-import { writeFile } from "node:fs/promises";
 
 console.debug(`Building configurator...`);
 // https://vitejs.dev/config/
@@ -39,10 +38,4 @@ await build({
     // Anything NOT 'node:' will be bundled.
     noExternal: /^(?!node:)/,
   },
-  plugins: [{
-    name: "my-plugin",
-    async closeBundle() {
-      await writeFile("dist/runtime/package.json", JSON.stringify({ type: "module" }))
-    }
-  }]
 });

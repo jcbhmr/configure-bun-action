@@ -10,7 +10,7 @@ import * as semver from "semver";
 import assert from "node:assert/strict";
 import * as YAML from "yaml";
 import { join, resolve } from "node:path";
-import { cp } from "node:fs/promises";
+import { cp, writeFile } from "node:fs/promises";
 
 const rootPath = resolve(core.getInput("path"));
 
@@ -61,6 +61,7 @@ mutate_it: {
   await cp(new URL(import.meta.resolve("./runtime/")), join(rootPath, ".bun"), {
     recursive: true,
   });
+  await writeFile(join(rootPath, ".bun", "package.json"), `{"type":"module"}`);
 
   // avx2 assumed to be true
   const installMatrix = [
