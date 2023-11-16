@@ -30,12 +30,13 @@ export async function main(stage: "main" | "pre" | "post") {
   const action = YAML.parse(await readFile(actionPath, "utf8"));
 
   const targetName = `${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`;
-  const exeExt = process.platform === "win32" ? ".exe" : "";
 
   const localBunInstallPath = join(rootPath, ".bun", targetName);
 
-  const bun = join(localBunInstallPath, "bin", "bun" + exeExt);
-  await gunzip(bun);
+  const bun = join(localBunInstallPath, "bin", "bun");
+  if (existsSync(`${bun}.gz`)) {
+    await gunzip(bun);
+  }
   const filePath = join(rootPath, action.runs[stage]!);
   const { exitCode, signal } = await $({
     stdio: "inherit",
