@@ -74,7 +74,6 @@ mutate_it: {
     { os: "macOS", arch: "ARM64" },
   ] as const;
   for (const { os, arch } of installMatrix) {
-    actionDoc.set(".bun.version", version);
     const targetName = `${os}-${arch}`;
     const installPath = join(rootPath, ".bun", targetName);
     await bunMetaInstall(installPath, tag, os, arch);
@@ -84,7 +83,7 @@ mutate_it: {
   // preserve the original action.yml runs into the .bun key
   // and add some meta
   const dotBunData = runs.toJSON();
-  // dotBunData.version = version;
+  dotBunData.version = version;
   actionDoc.set(".bun", dotBunData);
 
   const runsMain = runs.get("main");
