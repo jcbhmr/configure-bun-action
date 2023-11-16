@@ -12,9 +12,9 @@ export async function gunzip(path: string) {
   await pipeline(
     createReadStream(`${path}.gz`),
     createGunzip(),
-    createWriteStream(path)
+    createWriteStream(path),
   );
-  await chmod(path, (await stat(`${path}.gz`)).mode)
+  await chmod(path, (await stat(`${path}.gz`)).mode);
   await rm(`${path}.gz`);
 }
 
@@ -26,7 +26,7 @@ export async function main(stage: "main" | "pre" | "post") {
   assert(actionPath, `no action.yml found from ${import.meta.url}`);
   const rootPath = dirname(actionPath);
   const action = YAML.parse(await readFile(actionPath, "utf8"));
-  const dotBunData = action[".bun"]
+  const dotBunData = action[".bun"];
 
   const targetName = `${process.env.RUNNER_OS}-${process.env.RUNNER_ARCH}`;
 
@@ -37,13 +37,18 @@ export async function main(stage: "main" | "pre" | "post") {
     await gunzip(bun);
   }
   const filePath = join(rootPath, dotBunData[stage]!);
+  if (dotBunData.version.startsWith("0.")) {
+    console.warn(
+      "The 'bun0' version is deprecated and will be removed. Please use 'bun1' instead. For more information, visit https://github.com/jcbhmr/configure-bun-action and https://bun.sh/blog/bun-v1.0",
+    );
+  }
   const { failed, escapedCommand, exitCode, signal } = await $({
     stdio: "inherit",
     reject: false,
   })`${bun} ${filePath}`;
   if (failed) {
-    console.error(escapedCommand, "failed")
-    process.exit(100)
+    console.error(escapedCommand, "failed");
+    process.exit(100);
   } else if (signal) {
     process.kill(process.pid, signal);
   } else {
