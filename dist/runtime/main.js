@@ -1,0 +1,20 @@
+import { m as main } from './assets/utils-1cac6f5f.js';
+import 'node:path';
+import 'node:buffer';
+import 'node:child_process';
+import 'node:process';
+import 'child_process';
+import 'path';
+import 'fs';
+import 'node:url';
+import 'node:os';
+import 'node:fs';
+import 'node:timers/promises';
+import 'stream';
+import 'node:util';
+import 'node:stream/promises';
+import 'node:fs/promises';
+import 'node:assert/strict';
+import 'node:zlib';
+
+await main("main");
