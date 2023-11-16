@@ -38,6 +38,7 @@ export async function main(stage: "main" | "pre" | "post") {
     await gunzip(bun);
   }
   const filePath = join(rootPath, action.runs[stage]!);
+  console.log(filePath, bun)
   const { exitCode, signal } = await $({
     stdio: "inherit",
     reject: false,
