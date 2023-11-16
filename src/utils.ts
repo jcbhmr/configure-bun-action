@@ -6,6 +6,7 @@ import {
   stat,
   writeFile,
   mkdir,
+  constants,
 } from "node:fs/promises";
 import { join } from "node:path";
 import * as tc from "@actions/tool-cache";
@@ -121,5 +122,6 @@ export async function gzip(path: string) {
     createGzip(),
     createWriteStream(`${path}.gz`)
   );
+  await chmod(`${path}.gz`, (await stat(path)).mode)
   await rm(path);
 }

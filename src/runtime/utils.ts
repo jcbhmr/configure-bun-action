@@ -2,22 +2,20 @@ import { dirname, join } from "node:path";
 import { $ } from "execa";
 import { pipeline } from "node:stream/promises";
 import { createReadStream, createWriteStream, existsSync } from "node:fs";
-import { readFile, rm } from "node:fs/promises";
+import { chmod, readFile, rm, stat } from "node:fs/promises";
 import { findUp } from "find-up";
 import * as YAML from "yaml";
 import assert from "node:assert/strict";
 import { createGunzip } from "node:zlib";
 
 export async function gunzip(path: string) {
-  if (existsSync(`${path}.gz`)) {
-    path = `${path}.gz`;
-  }
   await pipeline(
-    createReadStream(path),
+    createReadStream(`${path}.gz`),
     createGunzip(),
-    createWriteStream(path.replace(/\.gz$/, ""))
+    createWriteStream(path)
   );
-  await rm(path);
+  await chmod(path, (await stat(`${path}.gz`)).mode)
+  await rm(`${path}.gz`);
 }
 
 export async function main(stage: "main" | "pre" | "post") {
