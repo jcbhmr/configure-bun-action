@@ -17,6 +17,7 @@ const rootPath = resolve(core.getInput("path"));
 const params = {
   __proto__: null,
   async bun0() {
+    core.warning("bun0 is deprecated and will be removed. Please use bun1 instead. For more information, visit https://github.com/jcbhmr/configure-bun-action and https://bun.sh/blog/bun-v1.0");
     const version = "0.8.1";
     const tag = "bun-v0.8.1";
     return { version, tag };
